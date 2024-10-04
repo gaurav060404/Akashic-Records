@@ -22,8 +22,15 @@ export default function Carousel() {
         <img 
         src={url[slide]} 
         alt={`Carousel ${slide}`}
-        className='h-full w-full absolute inset-0 overflow-hidden object-cover bg-center duration-500'
+        className="h-full w-full absolute inset-0 overflow-hidden object-cover bg-center duration-500 after:content-[''] after:w-full after:h-full after:absolute after:left-0 after:bottom-0"
         />
+        <div className='w-2/5 h-1/3 bottom-0 left-1/3 absolute flex flex-col items-center'>
+          <h1 className='font-custom3 text-5xl font-bold pr-20'>The Records Of Akasha</h1>
+          <div className='w-2/3 pt-3 pr-5'>
+            <p className='pl-3'>To Keep The All The Records Of Your </p>
+            <p>Favourite Movies , TV Shows And Animes</p>
+          </div>
+        </div>
     </div>
   )
 }

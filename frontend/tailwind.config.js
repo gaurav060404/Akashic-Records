@@ -13,7 +13,9 @@ export default {
         newnav : "#415a77"
       },
       fontFamily : {
-        custom : ["Afacad Flux"],
+        custom1 : ["Afacad Flux"],
+        custom2 : ["DM Sans"],
+        custom3 : ["Oswald"]
       }
     },
   },
