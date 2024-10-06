@@ -22,13 +22,14 @@ export default function Carousel() {
         <img 
         src={url[slide]} 
         alt={`Carousel ${slide}`}
-        className="h-full w-full absolute inset-0 overflow-hidden object-cover bg-center duration-500 after:content-[''] after:w-full after:h-full after:absolute after:left-0 after:bottom-0"
+        className="h-full w-full absolute inset-0 overflow-hidden object-cover bg-center duration-500 bg-blackOverlay"
         />
-        <div className='w-2/5 h-1/3 bottom-0 left-1/3 absolute flex flex-col items-center'>
-          <h1 className='font-custom3 text-5xl font-bold pr-20'>The Records Of Akasha</h1>
-          <div className='w-2/3 pt-3 pr-5'>
-            <p className='pl-3'>To Keep The All The Records Of Your </p>
-            <p>Favourite Movies , TV Shows And Animes</p>
+        <div className='w-2/3 h-1/3 bottom-0 left-1/4 absolute flex flex-col items-center pt-8 pr-24'>
+          <h1 className='font-custom4 text-5xl font-bold pr-40'>The Records Of Akasha</h1>
+          <div className='w-2/3 pt-2 pl-20'>
+            <p className='pl-3'>To Keep All The Records Of Your </p>
+            <p>Favourite Movies , TV Shows And Animes.</p>
+            <button className='rounded-sm bg-white font-custom4 hover:bg-green-500 hover:text-white cursor-pointer px-3 py-2 ml-24 mt-5 mb-2 border-none border-green-500 duration-300'>Click Here!!!</button>
           </div>
         </div>
     </div>

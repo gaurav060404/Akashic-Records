@@ -15,8 +15,9 @@ export default {
       fontFamily : {
         custom1 : ["Afacad Flux"],
         custom2 : ["DM Sans"],
-        custom3 : ["Oswald"]
-      }
+        custom3 : ["Oswald"],
+        custom4 : ["Poppins"]
+      },
     },
   },
   plugins: [],
