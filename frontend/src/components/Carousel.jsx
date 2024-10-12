@@ -3,10 +3,7 @@ import axios from 'axios'
 import Navbar from './Navbar';
 
 export default function Carousel() {
-  // const url = ['https://images.unsplash.com/photo-1727709350469-5fde916217a8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  //   'https://images.unsplash.com/photo-1727820880806-8da6deef7467?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  //   'https://images.unsplash.com/photo-1705087636671-9dad62ca6acf?q=80&w=1947&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'];
-
+  
   const [slide, setSlide] = useState(0);
   const [images, setImages] = useState([]);
 
@@ -45,7 +42,7 @@ export default function Carousel() {
           alt={`Carousel ${slide}`}
           className="h-full w-full absolute inset-0 overflow-hidden object-cover bg-center duration-500 bg-blackOverlay "
         />}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
       <div className='w-2/3 h-1/3 bottom-0 left-1/4 absolute flex flex-col items-center pt-8 pr-24'>
         <h1 className='font-custom4 text-5xl font-bold pr-40 text-white'>The Records Of Akasha</h1>
         <div className='w-2/3 pt-2 pl-20'>
