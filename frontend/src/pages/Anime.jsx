@@ -2,6 +2,8 @@ import React from 'react'
 
 export default function Anime() {
   return (
-    <div>Anime</div>
+    <div className='w-full h-full absolute'>
+      <Navbar/>
+    </div>
   )
 }
