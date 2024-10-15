@@ -20,7 +20,7 @@ export default function Home() {
           return !(series.original_language === "ja" && !series.adult);
         });
         setTrending(filteredSeries.map((trendingSMA) => {
-          return {posterPath  : trendingSMA.poster_path,posterName : trendingSMA.name};
+          return {posterPath  : trendingSMA.poster_path,posterName : trendingSMA.title ? trendingSMA.title : trendingSMA.name};
         }));       
       }
      catch (error) {
