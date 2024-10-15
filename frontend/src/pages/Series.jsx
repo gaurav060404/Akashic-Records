@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import List from '../components/List';
 import axios from 'axios';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { seriesState } from '../store/store';
 
 export default function Series() {
-  const [series, setSeries] = useState([]);
+  const series = useRecoilValue(seriesState);
+  const setSeries = useSetRecoilState(seriesState);
 
   useEffect(() => {
     async function getPoster() {

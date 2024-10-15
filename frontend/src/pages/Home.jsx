@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react'
 import Carousel from '../components/Carousel'
 import List from '../components/List'
 import axios from 'axios';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { allState } from '../store/store';
 
 export default function Home() {
-  const [trending,setTrending] = useState([]);
+  const trending = useRecoilValue(allState);
+  const setTrending = useSetRecoilState(allState);
 
   useEffect(()=>{
       async function getPoster() {

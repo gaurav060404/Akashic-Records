@@ -5,10 +5,12 @@ import Signup from './pages/Signup'
 import Movies from './pages/Movies'
 import Series from './pages/Series'
 import Anime from './pages/Anime'
+import { RecoilRoot } from 'recoil'
 
 export default function App() {
   return (
     <BrowserRouter>
+    <RecoilRoot>
     <div>
       <Routes>
         <Route path='/' element={<Home/>} ></Route>
@@ -18,6 +20,7 @@ export default function App() {
         <Route path='/series' element={<Series/>} ></Route>
       </Routes>
     </div>
+    </RecoilRoot>
     </BrowserRouter>
   )
 }

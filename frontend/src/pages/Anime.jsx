@@ -2,9 +2,12 @@ import React, { useEffect ,useState } from 'react'
 import Navbar from '../components/Navbar'
 import List from '../components/List';
 import axios from 'axios';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { animeState } from '../store/store';
 
 export default function Anime() {
-  const [anime,setAnime] = useState([]);
+  const anime = useRecoilValue(animeState);
+  const setAnime = useSetRecoilState(animeState);
 
   useEffect(()=>{
     async function getPoster() {

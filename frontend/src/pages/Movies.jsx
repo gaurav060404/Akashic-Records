@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import List from '../components/List';
 import axios from 'axios';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { moviesState } from '../store/store';
 
 export default function Movies() {
-  const [movies, setMovies] = useState([]);
+  const movies = useRecoilValue(moviesState);
+  const setMovies = useSetRecoilState(moviesState);
 
   useEffect(() => {
     async function getPoster() {
