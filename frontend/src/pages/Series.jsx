@@ -1,37 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Navbar from '../components/Navbar'
 import List from '../components/List';
-import axios from 'axios';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { seriesState } from '../store/store';
 
 export default function Series() {
   const series = useRecoilValue(seriesState);
-  const setSeries = useSetRecoilState(seriesState);
-
-  useEffect(() => {
-    async function getPoster() {
-      try {
-        //series
-        const seriesResult = await axios.get("https://api.themoviedb.org/3/trending/tv/week", {
-          params: {
-            api_key: import.meta.env.VITE_SECRET_KEY
-          }
-        });
-        const seriesData = seriesResult.data;
-        const filteredSeries = seriesData.results.filter((series) => {
-          return !(series.original_language === "ja" && !series.adult);
-        });
-        setSeries(filteredSeries.map((series) => {
-          return { posterPath: series.poster_path, posterName: series.name };
-        }));
-      }
-      catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
-    getPoster();
-  }, []);
+  
   return (
     <div className='w-full h-full absolute bg-black'>
       <div className='w-full h-20'>
