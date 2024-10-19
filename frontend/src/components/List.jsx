@@ -16,7 +16,7 @@ export default function List({title,poster}) {
         <div className='w-full text-white flex justify-between items-center px-24 pt-4'>
           <Link className='font-custom3 text-2xl hover:text-blue-300' to={`/${title.toLowerCase()}`}>Trending {title}</Link>
           {title!="" &&
-            <Link to={`/${title.toLowerCase()}`} className='hover:text-blue-400 cursor-pointer font-custom3 text-xs text-slate-300'>
+            <Link to={`/${title.toLowerCase()}/trending`} className='hover:text-blue-400 cursor-pointer font-custom3 text-xs text-slate-300'>
             View All
             </Link>
           }
