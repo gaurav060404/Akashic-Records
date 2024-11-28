@@ -10,7 +10,7 @@ export default function Carousel() {
   useEffect(() => {
     const interval = setInterval(() => {
       setSlide((prev) => (prev + 1) % images.length);
-    }, 12000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [images]);
