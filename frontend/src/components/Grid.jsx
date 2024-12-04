@@ -3,21 +3,11 @@ import React from 'react';
 export default function Grid() {
   return (
     <div className='pl-10 h-full bg-black m-auto grid grid-cols-5 gap-4'>
-      <CardGrid posterName={"Despicables"} />
-      <CardGrid posterName={"Despicables"} />
-      <CardGrid posterName={"Despicables"} />
-      <CardGrid posterName={"Despicables"} />
-      <CardGrid posterName={"Despicables"} />
-      <CardGrid posterName={"Despicables"} />
-      <CardGrid posterName={"Despicables"} />
-      <CardGrid posterName={"Despicables"} />
-      <CardGrid posterName={"Despicables"} />
-      <CardGrid posterName={"Despicables"} />
     </div>
   );
 }
 
-function CardGrid({ posterName }) {
+export function CardGrid({ posterName }) {
   return (
     <div className='h-80 w-48 bg-black flex flex-col justify-center items-center pt-8'>
       <div className='w-full h-full  flex flex-col justify-center items-center group'>

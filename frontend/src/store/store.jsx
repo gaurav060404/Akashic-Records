@@ -1,4 +1,4 @@
-import { selector } from "recoil";
+import { atom, selector } from "recoil";
 import axios from "axios";
 
 // Selector to fetch and process the trending data
@@ -96,4 +96,9 @@ export const animeSelector = selector({
     return [];
   }
  }
+});
+
+export const search = atom({
+    key : 'search',
+    default : ''
 });

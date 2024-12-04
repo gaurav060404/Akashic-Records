@@ -7,11 +7,12 @@ import { animeSelector } from '../store/store';
 
 export default function Anime() {
   const animeLoadable = useRecoilValueLoadable(animeSelector);
-
+  console.log(animeLoadable.contents);
+  
   return (
     <div className='w-full h-full absolute bg-black'>
       <div className='w-full h-20'>
-        <Navbar isHomePage={false} />
+        < Navbar isHomePage={false} />
       </div>
       {animeLoadable.state === 'loading' && <SkeletonList />}
       {animeLoadable.state === 'hasValue' && (
