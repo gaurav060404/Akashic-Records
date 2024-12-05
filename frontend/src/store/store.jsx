@@ -102,3 +102,8 @@ export const search = atom({
     key : 'search',
     default : ''
 });
+
+export const filtered = atom({
+  key : 'filtered',
+  default : []
+});
