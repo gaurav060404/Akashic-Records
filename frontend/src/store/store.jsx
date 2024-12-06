@@ -73,21 +73,48 @@ export const seriesSelector = selector({
     }
 });
 
+// export const animeSelector = selector({
+//   key : "animeSelector",
+//   get : async function getPoster() {
+//       try {
+//       //animes 
+//       const animeResult = await axios.get("https://api.themoviedb.org/3/trending/tv/week",{
+//         params : {
+//           api_key : import.meta.env.VITE_SECRET_KEY
+//         }
+//       });
+//       const animeData = animeResult.data;
+//       const filteredAnime = animeData.results.filter((anime)=>{
+//         return (anime.original_language === "ja" && !anime.adult);
+//       });
+//       return filteredAnime.map((anime) => {
+//         return {posterPath  : anime.poster_path,posterName : anime.name};
+//       });
+//     }
+//    catch (error) {
+//     console.error('Error fetching data:', error);
+//     return [];
+//   }
+//  }
+// });
+
+
 export const animeSelector = selector({
   key : "animeSelector",
   get : async function getPoster() {
+    const year = new Date().getFullYear();
       try {
       //animes 
-      const animeResult = await axios.get("https://api.themoviedb.org/3/trending/tv/week",{
+      const animeResult = await axios.get(`https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_genres=16&with_origin_country=JP&with_original_language=ja&year=${year}`,{
         params : {
           api_key : import.meta.env.VITE_SECRET_KEY
         }
       });
       const animeData = animeResult.data;
-      const filteredAnime = animeData.results.filter((anime)=>{
-        return (anime.original_language === "ja" && !anime.adult);
-      });
-      return filteredAnime.map((anime) => {
+      // const filteredAnime = animeData.results.filter((anime)=>{
+      //   return (anime.original_language === "ja" && !anime.adult);
+      // });
+      return animeData.results.map((anime) => {
         return {posterPath  : anime.poster_path,posterName : anime.name};
       });
     }
@@ -98,12 +125,3 @@ export const animeSelector = selector({
  }
 });
 
-export const search = atom({
-    key : 'search',
-    default : ''
-});
-
-export const filtered = atom({
-  key : 'filtered',
-  default : []
-});
