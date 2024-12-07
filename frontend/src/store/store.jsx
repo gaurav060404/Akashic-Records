@@ -138,3 +138,8 @@ export const animeSelector = selector({
   },
 });
 
+
+export const shuffledPostersState = atom({
+  key : 'shuffledPostersState',
+  default : [],
+});
