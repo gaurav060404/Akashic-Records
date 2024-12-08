@@ -7,6 +7,7 @@ import Series from './pages/Series'
 import Anime from './pages/Anime'
 import { RecoilRoot } from 'recoil'
 import AnimeTrending from './pages/AnimeTrending'
+import NotFound from './pages/NotFound'
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path='/movies' element={<Movies/>} ></Route>
         <Route path='/series' element={<Series/>} ></Route>
         <Route path='/anime/trending' element={<AnimeTrending/>} ></Route>
+        <Route path='*' element={<NotFound/>}></Route>
       </Routes>
     </div>
     </RecoilRoot>
