@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Grid({posters}) {
   return (
-    <div className='pl-24 h-96 bg-black grid grid-cols-5 gap-4 pt-2'>
+    <div className='pl-24 h-96 bg-black grid grid-cols-5 gap-4 pt-1'>
       {posters.map((poster,index)=>(
         <CardGrid key={index} posterPath={poster.posterPath} posterName={poster.posterName}/>
       ))}
@@ -12,7 +12,7 @@ export default function Grid({posters}) {
 
 export function CardGrid({posterPath,posterName}) {
   return (
-    <div className='h-80 w-48 bg-black flex flex-col justify-evenly items-center pt-4'>
+    <div className='h-80 w-48 bg-black flex flex-col justify-evenly items-center pt-2'>
       <div className='w-full h-full  flex flex-col justify-center items-center group'>
         <div className='bg-white h-5/6 w-full rounded-sm overflow-hidden'>
           <img
