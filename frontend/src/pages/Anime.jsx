@@ -14,7 +14,7 @@ export default function Anime() {
       <div className='w-full h-20'>
         < Navbar isHomePage={false} />
       </div>
-      {animeLoadable.state === 'loading' && <SkeletonList />}
+      {animeLoadable.state === 'loading' && <SkeletonList title="Anime" />}
       {animeLoadable.state === 'hasValue' && (
         <List title="Anime" poster={animeLoadable.contents} />
       )}
