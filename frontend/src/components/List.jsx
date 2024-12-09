@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Card from './Card';
 import { useRecoilState } from 'recoil';
-import { shuffledPostersState } from '../store/store';
+import { posterState, shuffledPostersState } from '../store/store';
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -14,11 +14,16 @@ function shuffleArray(array) {
 
 export default function List({ title, poster = []}) {
   const [shuffledPosters, setShuffledPosters] = useRecoilState(shuffledPostersState);
+  const [posters, setPosters] = useRecoilState(posterState);
   const shuffled = useMemo(()=>shuffleArray([...poster]).slice(0, 5),[poster]);
 
   useEffect(() => {
     setShuffledPosters(shuffled);
   }, [shuffled, setShuffledPosters]);
+
+  useEffect(()=>{
+    setPosters(shuffled);
+  },[shuffled,setPosters]);
 
   return (
     <div className='bg-black h-96 flex-row'>
@@ -35,7 +40,7 @@ export default function List({ title, poster = []}) {
       </div>
       <div className='bg-black h-80 flex justify-evenly'>
         {shuffled.map((posterData, index) => (
-          <Card key={index} posterPath={posterData.posterPath} posterName={posterData.posterName} />
+          <Card key={index} title={title} id={posterData.id} posterPath={posterData.posterPath} posterName={posterData.posterName} />
         ))}
       </div>
     </div>

@@ -101,7 +101,7 @@ export const animeSelector = selector({
       });
 
       const filteredAnimeData = filteredAnime.map((anime) => {
-        return { posterPath: anime.poster_path, posterName: anime.name };
+        return { id: anime.id ,posterPath: anime.poster_path, posterName: anime.name };
       });
 
       console.log(filteredAnimeData);
@@ -121,7 +121,7 @@ export const animeSelector = selector({
         const additionalAnimeData = additionalAnimeResult.data.results.filter((anime) => {
           return anime.original_language === 'ja' && !anime.adult;
         }).map((anime) => {
-          return { posterPath: anime.poster_path, posterName: anime.name };
+          return { id : anime.id , posterPath: anime.poster_path, posterName: anime.name};
         });
 
         for (let i = filteredAnimeData.length ; i < 5; i++) {
@@ -141,5 +141,10 @@ export const animeSelector = selector({
 
 export const shuffledPostersState = atom({
   key : 'shuffledPostersState',
+  default : [],
+});
+
+export const posterState = atom({
+  key : 'posterState',
   default : [],
 });
