@@ -20,8 +20,10 @@ export const allStateSelector = selector({
       });
       return filteredSeries.map((trendingSMA) => {
         return {
+          id : trendingSMA.id,
           posterPath: trendingSMA.poster_path,
           posterName: trendingSMA.title ? trendingSMA.title : trendingSMA.name,
+          backDropPath : trendingSMA.backdrop_path
         };
       });
     } catch (error) {
@@ -46,7 +48,11 @@ export const movieSelector = selector({
       );
       const movieData = movieResult.data;
       return movieData.results.map((movie) => {
-        return { posterPath: movie.poster_path, posterName: movie.title };
+        return { id : movie.id , 
+          posterPath: movie.poster_path, 
+          posterName: movie.title ,
+          backDropPath : movie.backdrop_path
+        };
       });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -73,8 +79,13 @@ export const seriesSelector = selector({
         return !(series.original_language === "ja" && !series.adult);
       });
       return filteredSeries.map((series) => {
-        return { posterPath: series.poster_path, posterName: series.name };
+        return { id : series.id , 
+          posterPath: series.poster_path,
+          posterName: series.name,
+          backDropPath : series.backdrop_path
+        };
       });
+      
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -101,7 +112,11 @@ export const animeSelector = selector({
       });
 
       const filteredAnimeData = filteredAnime.map((anime) => {
-        return { id: anime.id ,posterPath: anime.poster_path, posterName: anime.name };
+        return { id: anime.id ,
+          posterPath: anime.poster_path, 
+          posterName: anime.name,
+          backDropPath : anime.backdrop_path
+        };
       });
 
       console.log(filteredAnimeData);
@@ -121,7 +136,7 @@ export const animeSelector = selector({
         const additionalAnimeData = additionalAnimeResult.data.results.filter((anime) => {
           return anime.original_language === 'ja' && !anime.adult;
         }).map((anime) => {
-          return { id : anime.id , posterPath: anime.poster_path, posterName: anime.name};
+          return { id : anime.id , posterPath: anime.poster_path, posterName: anime.name , backDropPath : anime.backdrop_path};
         });
 
         for (let i = filteredAnimeData.length ; i < 5; i++) {

@@ -40,7 +40,7 @@ export default function List({ title, poster = []}) {
       </div>
       <div className='bg-black h-80 flex justify-evenly'>
         {shuffled.map((posterData, index) => (
-          <Card key={index} title={title} id={posterData.id} posterPath={posterData.posterPath} posterName={posterData.posterName} />
+          <Card key={index} title={title.toLowerCase()} id={posterData.id} posterPath={posterData.posterPath} posterName={posterData.posterName} />
         ))}
       </div>
     </div>

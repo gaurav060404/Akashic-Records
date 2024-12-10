@@ -3,10 +3,13 @@ import { redirect, useNavigate } from 'react-router-dom';
 
 export default function Card({title,id,posterPath,posterName}) {
   const navigate = useNavigate();
+  console.log(title);
+    
   function handleOnClick(){
     console.log("Clicked "+ id );
     const encodedPosterName = encodeURIComponent(posterName);
-    navigate(`/${title}/${id}/${encodedPosterName}`);
+    
+    navigate(`/${title || "trending"}/${id}/${encodedPosterName}`);
   }
   return (
     <div className='h-full w-48 bg-black flex-row justify-center items-center pt-4'>
