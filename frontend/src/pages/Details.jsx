@@ -2,6 +2,7 @@ import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { posterState } from '../store/store'
 import { useParams } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 export default function Details() {
   const posters = useRecoilValue(posterState);
@@ -10,7 +11,10 @@ export default function Details() {
   console.log(poster.posterPath);
 
   return (
-    <div className='h-screen w-full flex flex-col justify-center items-center bg-black'>
+    <div className='h-screen w-full flex flex-col justify-center items-center'>
+      <div className='w-full h-20 absolute z-40 top-4'>
+        < Navbar isHomePage={false} hasBg={true}/>
+      </div>
       <div className='relative bg-white h-1/2 w-full z-10'><img src={`https://image.tmdb.org/t/p/original${poster.backDropPath}`} alt={poster.posterName} className='object-cover w-full h-full ' /></div>
       <div className='relative bg-white h-1/2 w-full z-20 drop-shadow-2xl'></div>
       <div className='h-1/2 w-1/2 flex justify-center items-center absolute z-30'>

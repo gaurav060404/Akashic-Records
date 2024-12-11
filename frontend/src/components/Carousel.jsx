@@ -35,7 +35,7 @@ export default function Carousel() {
 
   return (
     <div className='h-screen w-full relative'>
-      <Navbar isHomePage={true}/>
+      <Navbar isHomePage={true} hasBg={false}/>
       {images.length > 0 &&
         <img
           src={`https://image.tmdb.org/t/p/original/${images[slide]}`}
