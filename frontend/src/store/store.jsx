@@ -153,7 +153,6 @@ export const animeSelector = selector({
   },
 });
 
-
 export const shuffledPostersState = atom({
   key : 'shuffledPostersState',
   default : [],
@@ -162,4 +161,27 @@ export const shuffledPostersState = atom({
 export const posterState = atom({
   key : 'posterState',
   default : [],
+});
+
+export const carouselPosters = selector({
+  key : 'carouselPosters',
+  get : async function fetchImage() {
+    try {
+      const result = await axios.get(`https://api.themoviedb.org/3/movie/popular`, {
+        params: {
+          api_key: import.meta.env.VITE_SECRET_KEY
+        }
+      });
+      const data = result.data;
+      return data.results.map(movie => movie.backdrop_path);
+    } catch (error) {
+      console.log('Error fetching data : ', error);
+      return [];
+    }
+  }
+});
+
+export const slides = atom({
+  key : 'slides',
+  default : 0
 });

@@ -17,7 +17,7 @@ export default function AnimeTrending() {
   return (
     <div className='w-full h-full absolute bg-black'>
       <div className='w-full h-20'>
-        <Navbar isHomePage={false} />
+        <Navbar isHomePage={false} hasBg={false}/>
       </div>
       {/* <div className='flex justify-between items-center px-10'>
       <div className='font-custom3 text-2xl text-white hover:text-blue-300'>Trending {title}</div>

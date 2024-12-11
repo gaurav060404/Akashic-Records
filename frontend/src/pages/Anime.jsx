@@ -12,7 +12,7 @@ export default function Anime() {
   return (
     <div className='w-full h-full absolute bg-black'>
       <div className='w-full h-20'>
-        < Navbar isHomePage={false} />
+        < Navbar isHomePage={false} hasBg={false} />
       </div>
       {animeLoadable.state === 'loading' && <SkeletonList title="Anime" />}
       {animeLoadable.state === 'hasValue' && (

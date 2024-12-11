@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import Navbar from './Navbar';
+import { useRecoilState } from 'recoil';
+import { slides } from '../store/store';
 
-export default function Carousel() {
+export default function Carousel({images}) {
   
-  const [slide, setSlide] = useState(0);
-  const [images, setImages] = useState([]);
+  const [slide, setSlide] = useRecoilState(slides);
+  // const [images, setImages] = useRecoil
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -15,23 +16,23 @@ export default function Carousel() {
     return () => clearInterval(interval);
   }, [images]);
 
-  useEffect(() => {
-    async function fetchImage() {
-      try {
-        const result = await axios.get(`https://api.themoviedb.org/3/movie/popular`, {
-          params: {
-            api_key: import.meta.env.VITE_SECRET_KEY
-          }
-        });
-        const data = result.data;
-        setImages(data.results.map(movie => movie.backdrop_path));
-      } catch (error) {
-        console.log('Error fetching data : ', error);
-      }
-    }
-    fetchImage();
-    // console.log(images.length);
-  }, []);
+  // useEffect(() => {
+  //   async function fetchImage() {
+  //     try {
+  //       const result = await axios.get(`https://api.themoviedb.org/3/movie/popular`, {
+  //         params: {
+  //           api_key: import.meta.env.VITE_SECRET_KEY
+  //         }
+  //       });
+  //       const data = result.data;
+  //       setImages(data.results.map(movie => movie.backdrop_path));
+  //     } catch (error) {
+  //       console.log('Error fetching data : ', error);
+  //     }
+  //   }
+  //   fetchImage();
+  //   // console.log(images.length);
+  // }, []);
 
   return (
     <div className='h-screen w-full relative'>

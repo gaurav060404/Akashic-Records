@@ -11,7 +11,7 @@ export default function Movies() {
   return (
     <div className='w-full h-full absolute bg-black'>
       <div className='w-full h-20'>
-        <Navbar isHomePage={false} />
+        <Navbar isHomePage={false} hasBg={false}/>
       </div>
       {moviesLoadable.state === 'loading' && <SkeletonList title="Movies" />}
       {moviesLoadable.state === 'hasValue' && (
