@@ -16,7 +16,7 @@ export default function Details() {
         < Navbar isHomePage={false} hasBg={true}/>
       </div>
       <div className='relative bg-white h-1/2 w-full z-10'><img src={`https://image.tmdb.org/t/p/original${poster.backDropPath}`} alt={poster.posterName} className='object-cover w-full h-full ' /></div>
-      <div className='relative bg-white h-1/2 w-full z-20 drop-shadow-2xl'></div>
+      <div className='relative bg-custom h-1/2 w-full z-20 shadow-custom'></div>
       <div className='h-1/2 w-1/2 flex justify-center items-center absolute z-30'>
         <div className='h-full w-52 flex-row justify-center items-center pt-4'>
           <div className='w-full h-full flex-row justify-center items-center group'>

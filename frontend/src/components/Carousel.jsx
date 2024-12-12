@@ -16,24 +16,6 @@ export default function Carousel({images}) {
     return () => clearInterval(interval);
   }, [images]);
 
-  // useEffect(() => {
-  //   async function fetchImage() {
-  //     try {
-  //       const result = await axios.get(`https://api.themoviedb.org/3/movie/popular`, {
-  //         params: {
-  //           api_key: import.meta.env.VITE_SECRET_KEY
-  //         }
-  //       });
-  //       const data = result.data;
-  //       setImages(data.results.map(movie => movie.backdrop_path));
-  //     } catch (error) {
-  //       console.log('Error fetching data : ', error);
-  //     }
-  //   }
-  //   fetchImage();
-  //   // console.log(images.length);
-  // }, []);
-
   return (
     <div className='h-screen w-full relative'>
       <Navbar isHomePage={true} hasBg={false}/>

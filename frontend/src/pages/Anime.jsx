@@ -16,7 +16,7 @@ export default function Anime() {
       </div>
       {animeLoadable.state === 'loading' && <SkeletonList title="Anime" />}
       {animeLoadable.state === 'hasValue' && (
-        <List title="Anime" poster={animeLoadable.contents} />
+        <List title="Anime" poster={animeLoadable.contents} isPopular={false}/>
       )}
       {animeLoadable.state === 'hasError' && (
         <div className='text-white'>Error loading data</div>

@@ -185,3 +185,27 @@ export const slides = atom({
   key : 'slides',
   default : 0
 });
+
+export const popularTvShows = selector({
+  key : 'popularTv',
+  get : async function getPopularTVShows() {
+    try {
+      const result = await axios.get('https://api.themoviedb.org/3/tv/popular?language=en-US&page=1',{
+        params : {
+          api_key : import.meta.env.VITE_SECRET_KEY
+        }
+      });
+      const tvShows = result.data;
+      return tvShows.results.map((tvShow)=>{
+        return { id: tvShow.id ,
+          posterPath: tvShow.poster_path, 
+          posterName: tvShow.name,
+          backDropPath : tvShow.backdrop_path
+        };
+      })
+    } catch (error) {
+      console.error("Error while fetching the tv shows ",error);
+      return [];
+    }
+  }
+})
