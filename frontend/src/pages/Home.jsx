@@ -33,7 +33,7 @@ export default function Home() {
           </svg>
         </div>
         <List title="" isPopular={false} poster={trending.contents} />
-        <List title="Series" poster={tv.contents} isPopular={true}/>
+        {/* <List title="Series" poster={tv.contents} isPopular={true}/> */}
       </div>
     )
   }
