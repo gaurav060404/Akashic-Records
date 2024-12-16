@@ -202,9 +202,37 @@ export const popularTvShows = selector({
           posterName: tvShow.name,
           backDropPath : tvShow.backdrop_path
         };
-      })
+      });
     } catch (error) {
       console.error("Error while fetching the tv shows ",error);
+      return [];
+    }
+  }
+});
+
+export const topRatedMovies = selector({
+  key : 'topRatedMovies',
+  get : async function getTopRatedMovies() {
+    try {
+      const result = await axios.get('https://api.themoviedb.org/3/movie/top_rated',{
+        params : {
+          api_key : import.meta.env.VITE_SECRET_KEY
+        }
+      });
+      const topRated = result.data;
+      return topRated.results.map((movie)=>{
+        return {
+          id : movie.id,
+          title : movie.title,
+          posterPath : movie.poster_path,
+          overview : movie.overview,
+          popularity : movie.popularity,
+          rating : movie.vote_average,
+          users : movie.vote_count
+        }
+      });
+    } catch (error) {
+      console.error(error);
       return [];
     }
   }

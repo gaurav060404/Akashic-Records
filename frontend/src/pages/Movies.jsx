@@ -1,13 +1,14 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
 import List from '../components/List';
-import { useRecoilValueLoadable } from 'recoil';
-import { movieSelector } from '../store/store';
+import { useRecoilValue, useRecoilValueLoadable } from 'recoil';
+import { movieSelector, topRatedMovies } from '../store/store';
 import SkeletonList from '../components/SkeletonList';
 import Rated from '../components/Rated';
 
 export default function Movies() {
   const moviesLoadable = useRecoilValueLoadable(movieSelector);
+  const rated = useRecoilValue(topRatedMovies);
 
   return (
     <div className='w-full h-full absolute bg-black'>
@@ -21,7 +22,7 @@ export default function Movies() {
       {moviesLoadable.state === 'hasError' && (
         <div className='text-white'>Error loading data</div>
       )}
-      <Rated title="Movies" isRated={true}/>
+      <Rated title="Movies" isRated={true} rated={rated}/>
     </div>
   )
 }
