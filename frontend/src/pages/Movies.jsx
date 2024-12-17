@@ -8,7 +8,7 @@ import Rated from '../components/Rated';
 
 export default function Movies() {
   const moviesLoadable = useRecoilValueLoadable(movieSelector);
-  const rated = useRecoilValue(topRatedMovies);
+  const ratedMovies = useRecoilValueLoadable(topRatedMovies);
 
   return (
     <div className='w-full h-full absolute bg-black'>
@@ -22,7 +22,11 @@ export default function Movies() {
       {moviesLoadable.state === 'hasError' && (
         <div className='text-white'>Error loading data</div>
       )}
-      <Rated title="Movies" isRated={true} rated={rated}/>
+      {ratedMovies.state == 'loading' && <div className='text-center'>loading...</div>}
+      {ratedMovies.state == 'hasValue' && <Rated title="Movies" isRated={true} rated={ratedMovies.contents}/>}
+      {ratedMovies.state === 'hasError' && (
+        <div className='text-white'>Error loading data</div>
+      )}
     </div>
   )
 }
