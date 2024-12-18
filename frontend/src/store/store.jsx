@@ -266,9 +266,18 @@ export const topRatedSeries = selector({
           api_key: import.meta.env.VITE_SECRET_KEY
         }
       });
-      const topRated = result.data;
+      const topRated = result.data.results;
+
+      console.log(topRated);
+
+      const filteredSeriesWithDetails = topRated.filter((series)=>{
+        return series.origin_country[0] !=="JP" && !series.isAdult
+      });
+
+      console.log(filteredSeriesWithDetails);
+
       const seriesWithDetails = await Promise.all(
-        topRated.results.map(async(series) => {
+        filteredSeriesWithDetails.map(async(series) => {
           const res = await axios.get(`https://api.themoviedb.org/3/tv/${series.id}`, {
             params: {
               api_key: import.meta.env.VITE_SECRET_KEY
@@ -290,7 +299,6 @@ export const topRatedSeries = selector({
           };
         })
       );
-
       return seriesWithDetails;
     } catch (error) {
       console.error('Error fetching top-rated series:', error);

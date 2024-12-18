@@ -18,8 +18,8 @@ export default function SkeletonRated({title,isRated}) {
       </div>
       <div className='bg-black w-full flex flex-col justify-center items-center gap-4 pt-4 pb-5'>
         {
-          Array(20).fill().map((_, index) => (
-            <SkeletonH/>
+          Array(10).fill().map((_, index) => (
+            <SkeletonH key={index}/>
           ))}
       </div>
     </div>

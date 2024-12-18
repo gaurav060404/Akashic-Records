@@ -14,7 +14,7 @@ export default function HorizontalCard({ rank , title , posterPath , overview , 
       </div>
       <div className='bg-transparent h-48 w-96 flex flex-col justify-start'>
         <h2 className='text-black text-3xl font-custom1 font-semi-bold'>{title}</h2>
-        <p className='text-md'>{overview}</p>
+        <p className='text-sm'>{overview}</p>
       </div>
       <div className='flex flex-col justify-start pt-3 pb-2 w-64'>
         <div>
