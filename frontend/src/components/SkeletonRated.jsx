@@ -1,10 +1,27 @@
-import React from 'react'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import SkeletonH from './SkeletonH';
 
-export default function HorizontalCard({ rank , title , posterPath , overview , rating , users, popularity , genres , languages , releaseDate ,runtime}) {
-  
+export default function SkeletonRated({title,isRated}) {
   return (
-    <div className='bg-gray-200 h-56 flex justify-start items-center pl-14 rounded-md gap-14 drop-shadow-sm shadow-white' style={{ width: '88%' }}>
-
+    <div className='bg-black h-full pb-7 flex-col justify-center items-center'>
+      <div className='w-full text-white flex justify-between items-center px-24 pt-4'>
+        <Link className='font-custom3 text-2xl hover:text-blue-300' to={`/${title.toLowerCase()}`}>{isRated ? "Top Rated" : "Trending"} {title}</Link>
+        {title && !isRated && (
+          <Link
+            to={`/${title.toLowerCase()}/trending?title=${encodeURIComponent(title)}`}
+            className='hover:text-blue-400 cursor-pointer font-custom3 text-xs text-slate-300'
+          >
+            View All
+          </Link>
+        )}
+      </div>
+      <div className='bg-black w-full flex flex-col justify-center items-center gap-4 pt-4 pb-5'>
+        {
+          Array(20).fill().map((_, index) => (
+            <SkeletonH/>
+          ))}
+      </div>
     </div>
   )
 }

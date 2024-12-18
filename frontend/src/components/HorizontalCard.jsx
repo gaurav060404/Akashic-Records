@@ -2,7 +2,6 @@ import React from 'react'
 
 export default function HorizontalCard({ rank , title , posterPath , overview , rating , users, popularity , genres , languages , releaseDate ,runtime}) {
   let popular = popularity.toString().slice(0,3);
-  console.log(popular[2]);
   if(popular[2] === "."){
     popular = popular.slice(0,2);
   }

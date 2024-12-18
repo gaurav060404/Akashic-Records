@@ -5,6 +5,7 @@ import { useRecoilValue, useRecoilValueLoadable } from 'recoil';
 import { seriesSelector, topRatedSeries } from '../store/store';
 import SkeletonList from '../components/SkeletonList';
 import Rated from '../components/Rated';
+import SkeletonRated from '../components/SkeletonRated';
 
 export default function Series() {
   const seriesLoadable = useRecoilValueLoadable(seriesSelector);
@@ -22,7 +23,7 @@ export default function Series() {
       {seriesLoadable.state === 'hasError' && (
         <div className='text-white'>Error loading data</div>
       )}
-      {ratedSeries.state === 'loading' && <div>Loading....</div>}
+      {ratedSeries.state === 'loading' && <SkeletonRated title={"Series"} isRated={true}/>}
       {ratedSeries.state === 'hasValue' && (
         <Rated title="Series" isRated={true} rated={ratedSeries.contents}/>
       )}

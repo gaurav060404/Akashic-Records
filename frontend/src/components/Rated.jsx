@@ -7,7 +7,7 @@ export default function Rated({ rated ,title, isRated }) {
         <div className='bg-black h-full pb-7 flex-col justify-center items-center'>
             <div className='w-full text-white flex justify-between items-center px-24 pt-4'>
                 <Link className='font-custom3 text-2xl hover:text-blue-300' to={`/${title.toLowerCase()}`}>{isRated ? "Top Rated" : "Trending"} {title}</Link>
-                {title && (
+                {title && !isRated && (
                     <Link
                         to={`/${title.toLowerCase()}/trending?title=${encodeURIComponent(title)}`}
                         className='hover:text-blue-400 cursor-pointer font-custom3 text-xs text-slate-300'

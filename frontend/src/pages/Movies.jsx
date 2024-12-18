@@ -5,6 +5,7 @@ import { useRecoilValue, useRecoilValueLoadable } from 'recoil';
 import { movieSelector, topRatedMovies } from '../store/store';
 import SkeletonList from '../components/SkeletonList';
 import Rated from '../components/Rated';
+import SkeletonRated from '../components/SkeletonRated';
 
 export default function Movies() {
   const moviesLoadable = useRecoilValueLoadable(movieSelector);
@@ -22,7 +23,7 @@ export default function Movies() {
       {moviesLoadable.state === 'hasError' && (
         <div className='text-white'>Error loading data</div>
       )}
-      {ratedMovies.state == 'loading' && <div className='text-center'>loading...</div>}
+      {ratedMovies.state == 'loading' && <SkeletonRated title={"Movies"} isRated={true}/>}
       {ratedMovies.state == 'hasValue' && <Rated title="Movies" isRated={true} rated={ratedMovies.contents}/>}
       {ratedMovies.state === 'hasError' && (
         <div className='text-white'>Error loading data</div>
