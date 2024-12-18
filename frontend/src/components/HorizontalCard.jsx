@@ -1,7 +1,8 @@
 import React from 'react'
 
-export default function HorizontalCard({ rank , title , posterPath , overview , rating , users, popularity , genres , languages , releaseDate ,runtime}) {
+export default function HorizontalCard({ rank ,name, title , posterPath , overview , rating , users, popularity , genres , languages , releaseDate ,runtime}) {
   let popular = popularity.toString().slice(0,3);
+  console.log(name);
   if(popular[2] === "."){
     popular = popular.slice(0,2);
   }
@@ -29,7 +30,7 @@ export default function HorizontalCard({ rank , title , posterPath , overview , 
         </div>
         <p className='pt-3 pr-14'>Popularity : {popular}</p>
         <p className='pt-3 pr-14'>Release Date : {releaseDate}</p>
-        <p className='pt-3 pr-14'>Episode : {runtime}</p>
+        <p className='pt-3 pr-14'>{name=="Movies" ? "Runtime" : "Episode" } : {name=="Movies" ? (runtime/60).toString().slice(0,3) + 'h' : (runtime)} </p>
       </div>
       <div className='pl-7 flex flex-col justify-center items-center'>
         <h1 className='font-custom4 text-6xl font-semibold pb-4'>{rating.slice(0,3)} </h1>

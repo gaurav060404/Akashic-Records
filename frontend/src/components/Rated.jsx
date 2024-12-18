@@ -19,7 +19,7 @@ export default function Rated({ rated ,title, isRated }) {
             <div className='bg-black w-full flex flex-col justify-center items-center gap-4 pt-4 pb-5'>
                 {
                     rated.map((data,index)=>
-                        <HorizontalCard key={data.id} rank={index+1} id={data.id} title={data.title} posterPath={data.posterPath} overview={data.overview} rating={data.rating.toString()} users={data.users} popularity={data.popularity.toString()} genres={data.genres} languages={data.languages} releaseDate={data.releaseDate} runtime={data.runtime}/>
+                        <HorizontalCard key={data.id} rank={index+1} id={data.id} name={title} title={data.title} posterPath={data.posterPath} overview={data.overview} rating={data.rating.toString()} users={data.users} popularity={data.popularity.toString()} genres={data.genres} languages={data.languages} releaseDate={data.releaseDate} runtime={data.runtime}/>
                     )
                 }
             </div>
