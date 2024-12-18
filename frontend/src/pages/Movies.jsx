@@ -18,7 +18,7 @@ export default function Movies() {
       </div>
       {moviesLoadable.state === 'loading' && <SkeletonList title="Movies" />}
       {moviesLoadable.state === 'hasValue' && (
-        <List title="Movies" poster={moviesLoadable.contents} isPopular={false}/>
+        <List title="Movies" poster={moviesLoadable.contents}/>
       )}
       {moviesLoadable.state === 'hasError' && (
         <div className='text-white'>Error loading data</div>

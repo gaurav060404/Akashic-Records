@@ -1,7 +1,7 @@
 import React from 'react'
 import { redirect, useNavigate } from 'react-router-dom';
 
-export default function Card({title,id,posterPath,posterName}) {
+export default function Card({title,id,posterPath,posterName,isRated}) {
   const navigate = useNavigate();
   console.log(title);
     
@@ -9,7 +9,7 @@ export default function Card({title,id,posterPath,posterName}) {
     console.log("Clicked "+ id );
     const encodedPosterName = encodeURIComponent(posterName);
     
-    navigate(`/${title || "trending"}/${id}/${encodedPosterName}`);
+    navigate(`/${title || "trending"}/${isRated ? "rated" : "trending"}/${id}/${encodedPosterName}`);
   }
   return (
     <div className='h-full w-48 bg-black flex-row justify-center items-center pt-4'>

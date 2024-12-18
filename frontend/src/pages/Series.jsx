@@ -18,7 +18,7 @@ export default function Series() {
       </div>
       {seriesLoadable.state === 'loading' && <SkeletonList title="Series"/>}
       {seriesLoadable.state === 'hasValue' && (
-        <List title="Series" poster={seriesLoadable.contents} isPopular={false}/>
+        <List title="Series" poster={seriesLoadable.contents} isRated={false}/>
       )}
       {seriesLoadable.state === 'hasError' && (
         <div className='text-white'>Error loading data</div>

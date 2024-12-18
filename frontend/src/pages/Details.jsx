@@ -1,14 +1,15 @@
 import React from 'react'
 import { useRecoilValue } from 'recoil'
-import { posterState } from '../store/store'
+import { posterState, ratedPosterState } from '../store/store'
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
 export default function Details() {
-  const posters = useRecoilValue(posterState);
-  const { id } = useParams();
+  const { id,category } = useParams();
+  const state = category === "trending" ? posterState : ratedPosterState;
+  const posters = useRecoilValue(state);
+  console.log(category);
   const poster = posters.find(poster => poster.id === parseInt(id));
-  console.log(poster.posterPath);
 
   return (
     <div className='h-screen w-full flex flex-col justify-center items-center'>

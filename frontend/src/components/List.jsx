@@ -12,7 +12,7 @@ function shuffleArray(array) {
   return array;
 }
 
-export default function List({ title, poster = [] , isPopular}) {
+export default function List({ title, poster = []}) {
   const [shuffledPosters, setShuffledPosters] = useRecoilState(shuffledPostersState);
   const [posters, setPosters] = useRecoilState(posterState);
   const shuffled = useMemo(()=>shuffleArray([...poster]).slice(0, 5),[poster]);
@@ -28,7 +28,7 @@ export default function List({ title, poster = [] , isPopular}) {
   return (
     <div className='bg-black h-96 pb-7 flex-row'>
       <div className='w-full text-white flex justify-between items-center px-24 pt-4'>
-        <Link className='font-custom3 text-2xl hover:text-blue-300' to={`/${title.toLowerCase()}`}>{ isPopular ? "Popular" : "Trending" } {title}</Link>
+        <Link className='font-custom3 text-2xl hover:text-blue-300' to={`/${title.toLowerCase()}`}>{"Trending" } {title}</Link>
         {title && (
           <Link
             to={`/${title.toLowerCase()}/trending?title=${encodeURIComponent(title)}`}
@@ -40,7 +40,7 @@ export default function List({ title, poster = [] , isPopular}) {
       </div>
       <div className='bg-black h-80 flex justify-evenly'>
         {shuffled.map((posterData, index) => (
-          <Card key={index} title={title.toLowerCase()} id={posterData.id} posterPath={posterData.posterPath} posterName={posterData.posterName} />
+          <Card key={index} title={title.toLowerCase()} id={posterData.id} posterPath={posterData.posterPath} posterName={posterData.posterName} isRated={false} />
         ))}
       </div>
     </div>

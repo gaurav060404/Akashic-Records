@@ -237,6 +237,7 @@ export const topRatedMovies = selector({
             id: movie.id,
             title: movie.title,
             posterPath: movie.poster_path,
+            backDropPath : movie.backdrop_path,
             overview: movie.overview,
             popularity: movie.popularity,
             rating: movie.vote_average,
@@ -288,6 +289,7 @@ export const topRatedSeries = selector({
             id: series.id,
             title: series.name,
             posterPath: series.poster_path,
+            backDropPath : series.backdrop_path,
             overview: series.overview,
             popularity: series.popularity,
             rating: series.vote_average,
@@ -305,4 +307,9 @@ export const topRatedSeries = selector({
       return [];
     }
   }
+});
+
+export const ratedPosterState = atom({
+  key : 'ratedPosterState',
+  default : []
 });
