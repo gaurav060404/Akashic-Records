@@ -96,64 +96,24 @@ export const seriesSelector = selector({
 });
 
 export const animeSelector = selector({
-  key: "animeSelector",
-  get: async function getPoster() {
+  key: 'animeSelector',
+  get: async function getAnime() {
     try {
-      //animes
-      const animeResult = await axios.get(
-        "https://api.themoviedb.org/3/trending/tv/week",
-        {
-          params: {
-            api_key: import.meta.env.VITE_SECRET_KEY,
-          },
-        }
-      );
-      const animeData = animeResult.data;
-      const filteredAnime = animeData.results.filter((anime) => {
-        return anime.original_language === "ja" && !anime.adult;
-      });
-
-      const filteredAnimeData = filteredAnime.map((anime) => {
+      const result = await axios.get('https://api.jikan.moe/v4/seasons/now');
+      const animes = result.data.data;
+      return animes.map((anime) => {
         return {
-          id: anime.id,
-          posterPath: anime.poster_path,
-          posterName: anime.name,
-          backDropPath: anime.backdrop_path
-        };
-      });
-
-      console.log(filteredAnimeData);
-
-      if (filteredAnimeData.length < 5) {
-        const year = new Date().getFullYear();
-        const date = new Date().getDate();
-        const additionalAnimeResult = await axios.get(
-          `https://api.themoviedb.org/3/discover/tv?air_date.lte=${date}&first_air_date_year=${year}&include_adult=false&include_null_first_air_dates=false&language=en-US&page=1&sort_by=popularity.desc&with_origin_country=JP&with_original_language=ja`,
-          {
-            params: {
-              api_key: import.meta.env.VITE_SECRET_KEY,
-            },
-          }
-        );
-
-        const additionalAnimeData = additionalAnimeResult.data.results.filter((anime) => {
-          return anime.original_language === 'ja' && !anime.adult;
-        }).map((anime) => {
-          return { id: anime.id, posterPath: anime.poster_path, posterName: anime.name, backDropPath: anime.backdrop_path };
-        });
-
-        for (let i = filteredAnimeData.length; i < 5; i++) {
-          filteredAnimeData.push(additionalAnimeData[i]);
+          id: anime.mal_id,
+          posterPath: anime.images.jpg.image_url,
+          posterName: anime.title_english,
+          backDropPath: anime.trailer.images.maximum_image_url
         }
-
-        return filteredAnimeData;
-      }
-      return filteredAnimeData;
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
     }
-  },
+  }
 });
 
 export const shuffledPostersState = atom({
@@ -237,15 +197,15 @@ export const topRatedMovies = selector({
             id: movie.id,
             title: movie.title,
             posterPath: movie.poster_path,
-            backDropPath : movie.backdrop_path,
+            backDropPath: movie.backdrop_path,
             overview: movie.overview,
             popularity: movie.popularity,
             rating: movie.vote_average,
             users: movie.vote_count,
-            genres : detail.genres,
+            genres: detail.genres,
             languages: detail.spoken_languages,
-            releaseDate : movie.release_date,
-            runtime : detail.runtime
+            releaseDate: movie.release_date,
+            runtime: detail.runtime
           };
         })
       );
@@ -259,8 +219,8 @@ export const topRatedMovies = selector({
 });
 
 export const topRatedSeries = selector({
-  key : 'topRatedSeries',
-  get :  async function getRatedSeries() {
+  key: 'topRatedSeries',
+  get: async function getRatedSeries() {
     try {
       const result = await axios.get('https://api.themoviedb.org/3/tv/top_rated', {
         params: {
@@ -271,14 +231,14 @@ export const topRatedSeries = selector({
 
       console.log(topRated);
 
-      const filteredSeriesWithDetails = topRated.filter((series)=>{
-        return series.origin_country[0] !=="JP" && !series.isAdult
+      const filteredSeriesWithDetails = topRated.filter((series) => {
+        return series.origin_country[0] !== "JP" && !series.isAdult
       });
 
       console.log(filteredSeriesWithDetails);
 
       const seriesWithDetails = await Promise.all(
-        filteredSeriesWithDetails.map(async(series) => {
+        filteredSeriesWithDetails.map(async (series) => {
           const res = await axios.get(`https://api.themoviedb.org/3/tv/${series.id}`, {
             params: {
               api_key: import.meta.env.VITE_SECRET_KEY
@@ -289,15 +249,15 @@ export const topRatedSeries = selector({
             id: series.id,
             title: series.name,
             posterPath: series.poster_path,
-            backDropPath : series.backdrop_path,
+            backDropPath: series.backdrop_path,
             overview: series.overview,
             popularity: series.popularity,
             rating: series.vote_average,
             users: series.vote_count,
-            genres : detail.genres,
+            genres: detail.genres,
             languages: detail.spoken_languages,
-            releaseDate : series.first_air_date,
-            runtime : detail.seasons[0].episode_count
+            releaseDate: series.first_air_date,
+            runtime: detail.seasons[0].episode_count
           };
         })
       );
@@ -310,6 +270,38 @@ export const topRatedSeries = selector({
 });
 
 export const ratedPosterState = atom({
-  key : 'ratedPosterState',
-  default : []
+  key: 'ratedPosterState',
+  default: []
+});
+
+export const topRatedAnimes = selector({
+  key: 'topRatedAnimes',
+  get: async function getRatedSeries() {
+    try {
+      const result = await axios.get('https://api.jikan.moe/v4/top/anime');
+      const topRated = result.data.data;
+
+      console.log(topRated);
+
+      return topRated.map((anime) => {
+          return {
+            id: anime.mal_id,
+            title: anime.titles[0].title,
+            posterPath: anime.images.jpg.image_url,
+            backDropPath: anime.trailer.images.maximum_image_url,
+            overview: anime.synopsis,
+            popularity: anime.popularity,
+            rating: anime.score,
+            users: anime.scored_by,
+            genres: anime.genres,
+            languages: [{english_name : 'Japanese'},{english_name : 'English'}],
+            releaseDate: anime.aired.from.slice(0,10),
+            runtime: anime.episodes
+          };
+        });
+    } catch (error) {
+      console.error('Error fetching top-rated series:', error);
+      return [];
+    }
+  }
 });
