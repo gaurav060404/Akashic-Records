@@ -1,15 +1,13 @@
 import React from 'react'
-import { redirect, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function Card({title,id,posterPath,posterName,isRated}) {
   const navigate = useNavigate();
   console.log(title);
-    
   function handleOnClick(){
     console.log("Clicked "+ id );
     const encodedPosterName = encodeURIComponent(posterName);
-    
-    navigate(`/${title || "trending"}/${isRated ? "rated" : "trending"}/${id}/${encodedPosterName}`);
+    navigate(title ? `/${title || "trending"}/${isRated ? "rated" : "trending"}/${id}/${encodedPosterName}` : `/${isRated ? "rated" : "trending"}/${id}/${encodedPosterName}`);
   }
   return (
     <div className='h-full w-48 bg-black flex-row justify-center items-center pt-4'>

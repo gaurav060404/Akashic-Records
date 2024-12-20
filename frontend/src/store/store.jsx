@@ -126,6 +126,16 @@ export const posterState = atom({
   default: [],
 });
 
+export const shuffledUpcomingPostersState = atom({
+  key: 'shuffledUpcomingPostersState',
+  default: [],
+});
+
+export const upcomingPosterState = atom({
+  key: 'upcomingPosterState',
+  default: [],
+});
+
 export const carouselPosters = selector({
   key: 'carouselPosters',
   get: async function fetchImage() {

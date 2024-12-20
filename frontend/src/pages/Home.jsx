@@ -9,7 +9,7 @@ export default function Home() {
   const [images, setImages] = useRecoilStateLoadable(carouselPosters);
   const [tv,setTv] = useRecoilStateLoadable(popularTvShows);
 
-  if (trending.state == "loading" && images.state == "loading") {
+  if (trending.state == "loading" && images.state == "loading" && tv.state == "loading") {
     return <div className='h-screen flex justify-center items-center bg-black'>
       <button disabled type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center">
         <svg aria-hidden="true" role="status" className="inline w-4 h-4 me-3 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,7 +21,7 @@ export default function Home() {
     </div>
   }
 
-  if (trending.state == "hasValue" && images.state == "hasValue" ) {
+  if (trending.state == "hasValue" && images.state == "hasValue" && tv.state == "hasValue") {
     return (
       <div className='w-full h-full absolute'>
         {/* <Navbar/> */}
@@ -32,8 +32,8 @@ export default function Home() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
           </svg>
         </div>
-        <List title="" isPopular={false} poster={trending.contents} />
-        {/* <List title="Series" poster={tv.contents} isPopular={true}/> */}
+        <List title="" poster={trending.contents} isUpcoming={false}/>
+        <List title="Series" poster={tv.contents} isUpcoming={true}/>
       </div>
     )
   }

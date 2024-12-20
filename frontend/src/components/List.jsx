@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import Card from './Card';
 import { useRecoilState } from 'recoil';
-import { posterState, shuffledPostersState } from '../store/store';
+import { posterState, shuffledPostersState, upcomingPosterState, shuffledUpcomingPostersState } from '../store/store';
+import Card from './Card';
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -12,23 +12,23 @@ function shuffleArray(array) {
   return array;
 }
 
-export default function List({ title, poster = []}) {
-  const [shuffledPosters, setShuffledPosters] = useRecoilState(shuffledPostersState);
-  const [posters, setPosters] = useRecoilState(posterState);
-  const shuffled = useMemo(()=>shuffleArray([...poster]).slice(0, 5),[poster]);
+export default function List({ title, poster = [], isUpcoming }) {
+  const shuffled = useMemo(() => shuffleArray([...poster]).slice(0, 5), [poster]);
+  const [shuffledPosters, setShuffledPosters] = useRecoilState(isUpcoming ? shuffledUpcomingPostersState : shuffledPostersState);
+  const [posters, setPosters] = useRecoilState(isUpcoming ? upcomingPosterState : posterState);
 
   useEffect(() => {
     setShuffledPosters(shuffled);
   }, [shuffled, setShuffledPosters]);
 
-  useEffect(()=>{
-    setPosters(shuffled);
-  },[shuffled,setPosters]);
+  useEffect(() => {
+    setPosters(poster);
+  }, [poster, setPosters]);
 
   return (
     <div className='bg-black h-96 pb-7 flex-row'>
       <div className='w-full text-white flex justify-between items-center px-24 pt-4'>
-        <Link className='font-custom3 text-2xl hover:text-blue-300' to={`/${title.toLowerCase()}`}>{"Trending" } {title}</Link>
+        <Link className='font-custom3 text-2xl hover:text-blue-300' to={`/${title.toLowerCase()}`}>{isUpcoming ? "Upcoming" : "Trending"} {title}</Link>
         {title && (
           <Link
             to={`/${title.toLowerCase()}/trending?title=${encodeURIComponent(title)}`}
@@ -39,8 +39,8 @@ export default function List({ title, poster = []}) {
         )}
       </div>
       <div className='bg-black h-80 flex justify-evenly'>
-        {shuffled.map((posterData, index) => (
-          <Card key={index} title={title.toLowerCase()} id={posterData.id} posterPath={posterData.posterPath} posterName={posterData.posterName} isRated={false} />
+        {shuffledPosters.map((posterData, index) => (
+          <Card key={index} title={title.toLowerCase()} id={posterData.id} posterPath={posterData.posterPath} posterName={posterData.posterName} />
         ))}
       </div>
     </div>

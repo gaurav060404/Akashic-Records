@@ -23,6 +23,7 @@ export default function App() {
         <Route path='/series' element={<Series/>} ></Route>
         <Route path='/anime/trending' element={<AnimeTrending/>} ></Route>
         <Route path='/:title/:category/:id/:posterName' element={<Details/>} ></Route>
+        <Route path='/:category/:id/:posterName' element={<Details/>} ></Route>
         <Route path='*' element={<NotFound/>}></Route>
       </Routes>
     </div>
