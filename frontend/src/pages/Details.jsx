@@ -1,19 +1,19 @@
 import React from 'react'
 import { useRecoilValue } from 'recoil'
-import { posterState, ratedPosterState, upcomingPosterState } from '../store/store'
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import returnState from '../utils/state';
 
 export default function Details() {
-  const { title,id,category } = useParams();
-  const state = category === "trending" ? title === "series" ? upcomingPosterState : posterState : ratedPosterState;
+  const { title, id, category } = useParams();
+  const state = returnState(title,category);
   const posters = useRecoilValue(state);
   const poster = posters.find(poster => poster.id === parseInt(id));
 
   return (
     <div className='h-screen w-full flex flex-col justify-center items-center'>
       <div className='w-full h-20 absolute z-40 top-4'>
-        < Navbar isHomePage={false} hasBg={true}/>
+        < Navbar isHomePage={false} hasBg={true} />
       </div>
       <div className='relative bg-white h-1/2 w-full z-10'><img src={title == "anime" ? poster.backDropPath : `https://image.tmdb.org/t/p/original${poster.backDropPath}`} alt={poster.posterName} className='object-cover w-full h-full ' /></div>
       <div className='relative bg-custom h-1/2 w-full z-20 shadow-custom'></div>

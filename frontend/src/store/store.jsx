@@ -238,15 +238,9 @@ export const topRatedSeries = selector({
         }
       });
       const topRated = result.data.results;
-
-      console.log(topRated);
-
       const filteredSeriesWithDetails = topRated.filter((series) => {
         return series.origin_country[0] !== "JP" && !series.isAdult
       });
-
-      console.log(filteredSeriesWithDetails);
-
       const seriesWithDetails = await Promise.all(
         filteredSeriesWithDetails.map(async (series) => {
           const res = await axios.get(`https://api.themoviedb.org/3/tv/${series.id}`, {
@@ -290,9 +284,6 @@ export const topRatedAnimes = selector({
     try {
       const result = await axios.get('https://api.jikan.moe/v4/top/anime');
       const topRated = result.data.data;
-
-      console.log(topRated);
-
       return topRated.map((anime) => {
           return {
             id: anime.mal_id,
