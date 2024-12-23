@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate  } from 'react-router-dom';
 
 export default function Card({title,id,posterPath,posterName,isUpcoming}) {
   const navigate = useNavigate();

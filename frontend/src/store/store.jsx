@@ -159,22 +159,22 @@ export const slides = atom({
   default: 0
 });
 
-export const popularTvShows = selector({
-  key: 'popularTv',
+export const popularMovies = selector({
+  key: 'popularMovies',
   get: async function getPopularTVShows() {
     try {
-      const result = await axios.get('https://api.themoviedb.org/3/tv/popular?language=en-US&page=1', {
+      const result = await axios.get('https://api.themoviedb.org/3/movie/upcoming', {
         params: {
           api_key: import.meta.env.VITE_SECRET_KEY
         }
       });
-      const tvShows = result.data;
-      return tvShows.results.map((tvShow) => {
+      const movies = result.data;
+      return  movies.results.map((movie) => {
         return {
-          id: tvShow.id,
-          posterPath: tvShow.poster_path,
-          posterName: tvShow.name,
-          backDropPath: tvShow.backdrop_path
+          id: movie.id,
+          posterPath: movie.poster_path,
+          posterName: movie.name,
+          backDropPath: movie.backdrop_path
         };
       });
     } catch (error) {

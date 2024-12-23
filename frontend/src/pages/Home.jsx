@@ -2,14 +2,15 @@ import React from 'react'
 import Carousel from '../components/Carousel'
 import List from '../components/List'
 import { useRecoilStateLoadable } from 'recoil';
-import { allStateSelector, carouselPosters, popularTvShows } from '../store/store';
+import { allStateSelector, carouselPosters, popularMovies} from '../store/store';
+import Companies from '../components/Companies';
 
 export default function Home() {
   const [trending, setTrending] = useRecoilStateLoadable(allStateSelector);
   const [images, setImages] = useRecoilStateLoadable(carouselPosters);
-  const [tv,setTv] = useRecoilStateLoadable(popularTvShows);
+  const [popularMovie,setPopularMovie] = useRecoilStateLoadable(popularMovies);
 
-  if (trending.state == "loading" && images.state == "loading" && tv.state == "loading") {
+  if (trending.state == "loading" && images.state == "loading" && popularMovie.state == "loading") {
     return <div className='h-screen flex justify-center items-center bg-black'>
       <button disabled type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center">
         <svg aria-hidden="true" role="status" className="inline w-4 h-4 me-3 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,10 +22,9 @@ export default function Home() {
     </div>
   }
 
-  if (trending.state == "hasValue" && images.state == "hasValue" && tv.state == "hasValue") {
+  if (trending.state == "hasValue" && images.state == "hasValue" && popularMovie.state == "hasValue") {
     return (
       <div className='w-full h-full absolute'>
-        {/* <Navbar/> */}
         <Carousel images={images.contents}/>
         <div className='text-white bg-black flex items-center justify-center'>
           <p className='py-6 px-3 font-custom4'>The all in one website for Pop Culture.</p>
@@ -33,7 +33,8 @@ export default function Home() {
           </svg>
         </div>
         <List title="" poster={trending.contents} isUpcoming={false}/>
-        <List title="Series" poster={tv.contents} isUpcoming={true}/>
+        <Companies />
+        <List title="Movies" poster={popularMovie.contents} isUpcoming={true}/>
       </div>
     )
   }
