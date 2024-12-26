@@ -23,7 +23,8 @@ export const allStateSelector = selector({
           id: trendingSMA.id,
           posterPath: trendingSMA.poster_path,
           posterName: trendingSMA.title ? trendingSMA.title : trendingSMA.name,
-          backDropPath: trendingSMA.backdrop_path
+          backDropPath: trendingSMA.backdrop_path,
+          overview : trendingSMA.overview
         };
       });
     } catch (error) {
@@ -52,7 +53,8 @@ export const movieSelector = selector({
           id: movie.id,
           posterPath: movie.poster_path,
           posterName: movie.title,
-          backDropPath: movie.backdrop_path
+          backDropPath: movie.backdrop_path,
+          overview : movie.overview
         };
       });
     } catch (error) {
@@ -79,15 +81,30 @@ export const seriesSelector = selector({
       const filteredSeries = seriesData.results.filter((series) => {
         return !(series.original_language === "ja" && !series.adult);
       });
-      return filteredSeries.map((series) => {
-        return {
-          id: series.id,
-          posterPath: series.poster_path,
-          posterName: series.name,
-          backDropPath: series.backdrop_path
-        };
-      });
-
+      
+      const seriesWithDetails = await Promise.all(
+        filteredSeries.map(async (series) => {
+          const details = await axios.get(`https://api.themoviedb.org/3/tv/${series.id}`, {
+            params: {
+              api_key: import.meta.env.VITE_SECRET_KEY,
+            },
+          });
+          return {
+            id: series.id,
+            posterPath: series.poster_path,
+            posterName: series.name,
+            backDropPath: series.backdrop_path,
+            genres: details.data.genres,
+            languages: details.data.spoken_languages,
+            releaseDate: details.data.first_air_date,
+            seasons: details.data.number_of_seasons,
+            directedBy : details.data.created_by,
+            networks : details.data.networks,
+            overview : series.overview
+          };
+        })
+      );
+      return seriesWithDetails;
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -106,7 +123,8 @@ export const animeSelector = selector({
           id: anime.mal_id,
           posterPath: anime.images.jpg.image_url,
           posterName: anime.title_english,
-          backDropPath: anime.trailer.images.maximum_image_url
+          backDropPath: anime.trailer.images.maximum_image_url,
+          overview : anime.synopsis
         }
       });
     } catch (error) {
@@ -170,11 +188,13 @@ export const popularMovies = selector({
       });
       const movies = result.data;
       return  movies.results.map((movie) => {
+        console.log(movie.overview);
         return {
           id: movie.id,
           posterPath: movie.poster_path,
-          posterName: movie.name,
-          backDropPath: movie.backdrop_path
+          posterName: movie.title,
+          backDropPath: movie.backdrop_path,
+          overview : movie.overview
         };
       });
     } catch (error) {
@@ -206,6 +226,7 @@ export const topRatedMovies = selector({
           return {
             id: movie.id,
             title: movie.title,
+            posterName : movie.title,
             posterPath: movie.poster_path,
             backDropPath: movie.backdrop_path,
             overview: movie.overview,
@@ -252,6 +273,7 @@ export const topRatedSeries = selector({
           return {
             id: series.id,
             title: series.name,
+            posterName : series.name,
             posterPath: series.poster_path,
             backDropPath: series.backdrop_path,
             overview: series.overview,
@@ -261,7 +283,10 @@ export const topRatedSeries = selector({
             genres: detail.genres,
             languages: detail.spoken_languages,
             releaseDate: series.first_air_date,
-            runtime: detail.seasons[0].episode_count
+            runtime: detail.seasons[0].episode_count,
+            seasons: detail.number_of_seasons,
+            directedBy : detail.created_by,
+            networks : detail.networks
           };
         })
       );
@@ -288,6 +313,7 @@ export const topRatedAnimes = selector({
           return {
             id: anime.mal_id,
             title: anime.titles[0].title,
+            posterName : anime.titles[0].title,
             posterPath: anime.images.jpg.image_url,
             backDropPath: anime.trailer.images.maximum_image_url,
             overview: anime.synopsis,

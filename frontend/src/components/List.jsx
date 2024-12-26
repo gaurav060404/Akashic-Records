@@ -24,7 +24,7 @@ export default function List({ title, poster = [], isUpcoming }) {
   useEffect(() => {
     setPosters(poster);
   }, [poster, setPosters]);
-
+  
   return (
     <div className='bg-black h-96 pb-7 flex-row'>
       <div className='w-full text-white flex justify-between items-center px-24 pt-4'>
