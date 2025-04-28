@@ -42,8 +42,8 @@ export default function Details() {
             <div className='bg-white h-5/6 rounded-sm overflow-hidden shadow-xl'>
               <img src={title === "anime" ? poster.posterPath : `https://image.tmdb.org/t/p/w220_and_h330_face${poster.posterPath}`} alt={poster.posterName} className='object-cover w-full h-full hover:shadow-md' />
             </div>
-            <p className='text-center pt-2'>directed by</p>
-            <p className='text-center '>Christoph Waltz</p>
+            <p className='text-center pt-2'>Directed By</p>
+            <p className='text-center '>{poster.director}</p>
           </div>
         </div>
       </div>

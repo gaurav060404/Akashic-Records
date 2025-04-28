@@ -1,16 +1,19 @@
 import React from 'react'
 import Carousel from '../components/Carousel'
 import List from '../components/List'
-import { useRecoilStateLoadable } from 'recoil';
-import { allStateSelector, carouselPosters, popularMovies} from '../store/store';
+import { useRecoilValueLoadable } from 'recoil';
+import { allStateSelector, carouselPosters, popularMovies, popularSeriesSelector} from '../store/store';
 import Companies from '../components/Companies';
 
 export default function Home() {
-  const [trending, setTrending] = useRecoilStateLoadable(allStateSelector);
-  const [images, setImages] = useRecoilStateLoadable(carouselPosters);
-  const [popularMovie,setPopularMovie] = useRecoilStateLoadable(popularMovies);
+  const trending = useRecoilValueLoadable(allStateSelector);
+  const images = useRecoilValueLoadable(carouselPosters);
+  const popularMovie = useRecoilValueLoadable(popularMovies);
+  const popularSeries = useRecoilValueLoadable(popularSeriesSelector);
 
-  if (trending.state == "loading" && images.state == "loading" && popularMovie.state == "loading") {
+  const loadables = [trending,images,popularMovie,popularSeries];
+
+  if (loadables.some(l=> l.state === 'loading')) {
     return <div className='h-screen flex justify-center items-center bg-black'>
       <button disabled type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center">
         <svg aria-hidden="true" role="status" className="inline w-4 h-4 me-3 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -22,7 +25,22 @@ export default function Home() {
     </div>
   }
 
-  if (trending.state == "hasValue" && images.state == "hasValue" && popularMovie.state == "hasValue") {
+  if(loadables.some(l => l.state === 'hasError')){
+    return(
+      <div className='h-screen flex items-start justify-center bg-black text-white'>
+        Oops!! Something Went Wrong
+      </div>
+    )
+  }
+
+  const movies   = popularMovie.contents;
+  const series   = popularSeries.contents;
+
+  // debug
+  console.log('Movies:', movies);
+  console.log('Series:', series);
+
+  if (loadables.every(l=>l.state === 'hasValue')) {
     return (
       <div className='w-full h-full absolute'>
         <Carousel images={images.contents}/>
@@ -32,10 +50,12 @@ export default function Home() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
           </svg>
         </div>
-        <List title="" poster={trending.contents} isUpcoming={false}/>
+        <List key="trending" title="" poster={trending.contents} isUpcoming={false}/>
         <Companies />
-        <List title="Movies" poster={popularMovie.contents} isUpcoming={true}/>
+        <List key="popularMoviesList" title="Movies" poster={popularMovie.contents} isUpcoming={true}/>
+        <List key="popularSeriesList" title="Series" poster={popularSeries.contents} isUpcoming={true}/>
       </div>
     )
   }
+  return null;
 }

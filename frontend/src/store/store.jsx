@@ -89,6 +89,14 @@ export const seriesSelector = selector({
               api_key: import.meta.env.VITE_SECRET_KEY,
             },
           });
+
+          const res = await axios.get(`https://api.themoviedb.org/3/tv/${series.id}/credits`,{
+            params : {
+              api_key : import.meta.env.VITE_SECRET_KEY
+            }
+          });
+
+          const credit = res.data.crew.find(crew => crew.job === "Director");
           return {
             id: series.id,
             posterPath: series.poster_path,
@@ -186,19 +194,37 @@ export const popularMovies = selector({
           api_key: import.meta.env.VITE_SECRET_KEY
         }
       });
-      const movies = result.data;
-      return  movies.results.map((movie) => {
-        console.log(movie.overview);
+      const moviesData = result.data;
+      const movies = moviesData.results.map((movie) => {
         return {
           id: movie.id,
           posterPath: movie.poster_path,
           posterName: movie.title,
           backDropPath: movie.backdrop_path,
-          overview : movie.overview
+          overview : movie.overview,
+          ratings : movie.vote_average,
+          releaseDate : movie.release_date,
+          popularity : movie.popularity
         };
-      });
+      });      
+      const moviesWithCredits = await Promise.all(
+        movies.map(async (movie) => {
+          const res = await axios.get(`https://api.themoviedb.org/3/movie/${movie.id}/credits`,{
+            params : {
+              api_key : import.meta.env.VITE_SECRET_KEY
+            }
+          });
+          const credit = res.data.crew.find(crew => crew.job === "Director");
+          return {
+            ...movie,
+            director : credit.name
+          };
+        })
+      );
+      console.log(moviesWithCredits);
+      return moviesWithCredits;
     } catch (error) {
-      console.error("Error while fetching the tv shows ", error);
+      console.error("Error while fetching the movies", error);
       return [];
     }
   }
@@ -217,12 +243,20 @@ export const topRatedMovies = selector({
 
       const moviesWithDetails = await Promise.all(
         topRated.results.map(async (movie) => {
-          const res = await axios.get(`https://api.themoviedb.org/3/movie/${movie.id}`, {
+          const res1 = await axios.get(`https://api.themoviedb.org/3/movie/${movie.id}`, {
             params: {
               api_key: import.meta.env.VITE_SECRET_KEY
             }
           });
-          const detail = res.data;
+
+          const res2 = await axios.get(`https://api.themoviedb.org/3/movie/${movie.id}/credits`,{
+            params : {
+              api_key : import.meta.env.VITE_SECRET_KEY
+            }
+          });
+
+          const detail = res1.data;
+          const credit = res2.data.crew.find(crew => crew.job === "Director");
           return {
             id: movie.id,
             title: movie.title,
@@ -236,7 +270,8 @@ export const topRatedMovies = selector({
             genres: detail.genres,
             languages: detail.spoken_languages,
             releaseDate: movie.release_date,
-            runtime: detail.runtime
+            runtime: detail.runtime,
+            director: credit.name
           };
         })
       );
@@ -269,7 +304,9 @@ export const topRatedSeries = selector({
               api_key: import.meta.env.VITE_SECRET_KEY
             }
           });
+
           const detail = res.data;
+          
           return {
             id: series.id,
             title: series.name,
@@ -285,14 +322,47 @@ export const topRatedSeries = selector({
             releaseDate: series.first_air_date,
             runtime: detail.seasons[0].episode_count,
             seasons: detail.number_of_seasons,
-            directedBy : detail.created_by,
-            networks : detail.networks
+            director : detail.created_by,
+            networks : detail.networks,
           };
         })
       );
+
+      console.log(seriesWithDetails);
+
       return seriesWithDetails;
     } catch (error) {
       console.error('Error fetching top-rated series:', error);
+      return [];
+    }
+  }
+});
+
+export const popularSeriesSelector = selector({
+  key : 'popularSeries',
+  get : async () => {
+    try {
+      const result = await axios.get("https://api.themoviedb.org/3/tv/popular",{
+        params : {
+          api_key : import.meta.env.VITE_SECRET_KEY
+        }
+      });
+      const popularSeriesData = result.data;
+      const popularSeries = popularSeriesData.results.map((series)=>{
+        return {
+          id : series.id,
+          posterPath : series.poster_path,
+          posterName : series.name,
+          backDropPath : series.backdrop_path,
+          overview : series.overview,
+          ratings : series.vote_average,
+          popularity : series.popularity,
+          releaseDate : series.first_air_date
+        }
+      });
+      return popularSeries;
+    } catch (error) {
+      console.error("Error fetching the popular series data");
       return [];
     }
   }
