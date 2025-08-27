@@ -12,7 +12,7 @@ Lightweight React + Vite frontend that aggregates Movies, TV shows and Anime usi
 - Tailwind CSS for styles
 - React Router for navigation
 
-## Quick start (Windows)
+## Quick start 
 1. Install dependencies
    - PowerShell / CMD:
      npm install
