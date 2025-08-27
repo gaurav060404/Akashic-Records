@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Card from './Card';
 
@@ -10,26 +10,49 @@ function shuffleArray(array) {
   return array;
 }
 
-export default function List({ title, poster }) {
-  const shuffledPosters = shuffleArray([...poster]).slice(0, 5);
-  console.log(title);
-  
+export default function List({ title = '', poster = [], isUpcoming }) {
+  const initial = useMemo(
+    () => shuffleArray([...poster]).slice(0, 5),
+    [poster]
+  );
+
+  const [shuffledPosters, setShuffledPosters] = useState(initial);
+
+  useEffect(() => {
+    setShuffledPosters(shuffleArray([...poster]).slice(0, 5));
+  }, [poster]);
+
   return (
-    <div className='bg-black h-96 flex-row'>
+    <div className='bg-black h-auto pb-7 flex-row'>
       <div className='w-full text-white flex justify-between items-center px-24 pt-4'>
-        <Link className='font-custom3 text-2xl hover:text-blue-300' to={`/${title.toLowerCase()}`}>Trending {title}</Link>
-        {title !== "" &&
+        <Link
+          className='font-custom3 text-2xl hover:text-blue-300'
+          to={`/${title.toLowerCase()}`}
+        >
+          {isUpcoming ? 'Upcoming' : 'Trending'} {title}
+        </Link>
+        {title && (
           <Link
-            to={`/${title.toLowerCase()}/trending?title=${encodeURIComponent(title)}`}
+            to={`/${title.toLowerCase()}/trending?title=${encodeURIComponent(
+              title
+            )}`}
             className='hover:text-blue-400 cursor-pointer font-custom3 text-xs text-slate-300'
           >
             View All
           </Link>
-        }
+        )}
       </div>
+
       <div className='bg-black h-80 flex justify-evenly'>
-        {shuffledPosters.map((posterData, index) => (
-          <Card key={index} posterPath={posterData.posterPath} posterName={posterData.posterName} />
+        {shuffledPosters.map((item) => (
+          <Card
+            key={item.id}
+            id={item.id}
+            title={title.toLowerCase()}
+            posterPath={item.posterPath}
+            posterName={item.posterName}
+            isUpcoming={isUpcoming}
+          />
         ))}
       </div>
     </div>

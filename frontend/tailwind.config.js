@@ -10,7 +10,8 @@ export default {
       colors : {
         ...defaultColors,
         nav : "#ffc300",
-        newnav : "#415a77"
+        newnav : "#415a77",
+        custom : "#EDF1F5"
       },
       fontFamily : {
         custom1 : ["Afacad Flux"],
@@ -18,6 +19,9 @@ export default {
         custom3 : ["Oswald"],
         custom4 : ["Poppins"]
       },
+      boxShadow : {
+        custom: '70px 50px 40px 40px rgba(0, 0, 0, 0.3)',
+      }
     },
   },
   plugins: [],
