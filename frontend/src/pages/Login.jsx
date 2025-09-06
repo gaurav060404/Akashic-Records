@@ -1,19 +1,20 @@
 import { useState, useEffect } from 'react';
-import { useRecoilValueLoadable } from 'recoil'; // Changed from useRecoilValue
+import { useRecoilValueLoadable } from 'recoil';
 import { carouselPosters } from '../store/store.jsx';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import '../index.css';
 import logo from '../assets/logo.png';
 
-const Signup = () => {
+const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const postersLoadable = useRecoilValueLoadable(carouselPosters); // Use Loadable
+  const postersLoadable = useRecoilValueLoadable(carouselPosters);
 
-  function handleSignUp(e) {
-    e.preventDefault(); // Prevent form submission
-    console.log("Sign up clicked");
+  function handleLogin(e) {
+    e.preventDefault();
+    console.log("Login clicked");
   }
 
   // Rotate through posters every 5 seconds
@@ -89,8 +90,8 @@ const Signup = () => {
           {/* Overlay with content */}
           <div className="poster-overlay">
             <div className="tagline">
-              <h2 className='text-center font-custom1'>Discover and Share</h2>
-              <h2 className='text-center font-custom1'>Your Favorite Movies, Series & Anime</h2>
+              <h2 className='text-center font-custom1'>Welcome Back</h2>
+              <h2 className='text-center font-custom1'>To Your Akashic Journey</h2>
             </div>
 
             {/* Dots indicator */}
@@ -107,19 +108,13 @@ const Signup = () => {
         </div>
       </div>
 
-      {/* Right side - Sign up form */}
+      {/* Right side - Login form */}
       <div className="form-side">
         <div className="form-content">
-          <h1>Create an account</h1>
-          <p className="account-prompt">Already have an account? <a href="/login">Log in</a></p>
+          <h1>Log in</h1>
+          <p className="account-prompt">Don't have an account? <Link to="/signup">Sign up</Link></p>
 
-          <form className="signup-form" onSubmit={handleSignUp}>
-            <div className="name-row">
-              <div className="input-group">
-                <input type="text" placeholder="Name" required />
-              </div>
-            </div>
-
+          <form className="signup-form" onSubmit={handleLogin}>
             <div className="input-group">
               <input type="email" placeholder="Email" required />
               <div className="email-icon">
@@ -144,15 +139,19 @@ const Signup = () => {
               </button>
             </div>
 
+            <div className="forgot-password">
+              <Link to="/forgot-password">Forgot password?</Link>
+            </div>
+
             <button
               type="submit"
               className="create-account-btn"
             >
-              Create account
+              Log in
             </button>
 
             <div className="divider">
-              <span>Or register with</span>
+              <span>Or login with</span>
             </div>
 
             <div className="social-login">
@@ -173,4 +172,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;

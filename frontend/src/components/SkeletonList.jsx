@@ -12,14 +12,6 @@ const SkeletonList = ({title}) => {
       </div> */}
       <div className='w-full text-white flex justify-between items-center px-24 pt-4'>
         <Link className='font-custom3 text-2xl hover:text-blue-300' to={`/${title.toLowerCase()}`}>Trending {title}</Link>
-        {title && (
-          <Link
-            to={`/${title.toLowerCase()}/trending?title=${encodeURIComponent(title)}`}
-            className='hover:text-blue-400 cursor-pointer font-custom3 text-xs text-slate-300'
-          >
-            View All
-          </Link>
-        )}
       </div>
       <div className='bg-black h-80 flex justify-evenly'>
         {Array(5).fill().map((_, index) => (

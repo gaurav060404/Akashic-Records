@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "axios": "^1.7.7",
+    "framer-motion": "^12.23.12",
     "frontend": "file:",
+    "lucide-react": "^0.542.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-icons": "^5.5.0",
     "react-loading-skeleton": "^3.5.0",
     "react-router-dom": "^6.26.2",
     "recoil": "^0.7.7"

@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function Grid({posters}) {
   return (
     <div className='pl-24 h-96 bg-black grid grid-cols-5 gap-4 pt-1'>

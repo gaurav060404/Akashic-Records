@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import List from '../components/List';
 import { useRecoilValue, useRecoilValueLoadable } from 'recoil';
@@ -10,6 +10,10 @@ import SkeletonRated from '../components/SkeletonRated';
 export default function Series() {
   const seriesLoadable = useRecoilValueLoadable(seriesSelector);
   const ratedSeries = useRecoilValueLoadable(topRatedSeries);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className='w-full h-full absolute bg-black'>
