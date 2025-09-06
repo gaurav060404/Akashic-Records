@@ -5,3 +5,297 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.signup-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Left side with movie posters */
+.poster-side {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  background-color: #000; /* Ensure dark background during transitions */
+}
+
+.logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+}
+
+.poster-background-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.poster-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+}
+
+.poster-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+  padding: 40px;
+  box-sizing: border-box;
+  color: white;
+  z-index: 2;
+}
+
+.tagline {
+  margin-top: auto;
+  margin-bottom: 60px;
+}
+
+.tagline h2 {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin: 8px 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0.4);
+  margin: 0 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background-color: white;
+  width: 20px;
+  border-radius: 4px;
+}
+
+/* Right side with form */
+.form-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; /* Center the form content */
+  padding: 20px;
+  background-color: #12122a; /* Darker background like in the reference */
+  color: white;
+}
+
+.form-side h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.form-side p {
+  margin-bottom: 30px;
+  color: #a0a0a0;
+}
+
+.form-side a {
+  color: #7c4dff;
+  text-decoration: none;
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.name-row {
+  display: flex;
+  gap: 16px;
+}
+
+.name-row .input-group {
+  flex: 1;
+}
+
+.input-group {
+  position: relative;
+  width: 100%;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #333344;
+  background-color: #1e1e36; /* Slightly darker for better contrast */
+  color: white;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+  padding-right: 40px; /* Space for icons */
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #7c4dff;
+}
+
+.email-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0a0a0;
+}
+
+.password-group {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #a0a0a0;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.terms-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.terms-group input {
+  width: 16px;
+  height: 16px;
+  accent-color: #7c4dff;
+}
+
+.terms-group label {
+  font-size: 14px;
+  color: #a0a0a0;
+}
+
+.create-account-btn {
+  padding: 15px;
+  border-radius: 8px;
+  border: none;
+  background-color: #7c4dff;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+.create-account-btn:hover {
+  background-color: #6a3aff;
+}
+
+.create-account-btn:disabled {
+  background-color: #444455;
+  cursor: not-allowed;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #333344;
+}
+
+.divider span {
+  padding: 0 15px;
+  color: #a0a0a0;
+  font-size: 14px;
+}
+
+.social-login {
+  display: flex;
+  gap: 16px;
+}
+
+.google-btn,
+.apple-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #333344;
+  background-color: #1e1e36; /* Match input fields */
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.google-btn:hover,
+.apple-btn:hover {
+  background-color: #252538;
+}
+
+.google-btn svg,
+.apple-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 768px) {
+  .signup-container {
+    flex-direction: column;
+  }
+  
+  .poster-side {
+    height: 40vh; /* Increase height on mobile */
+  }
+  
+  .form-side {
+    padding: 20px 15px;
+  }
+  
+  .name-row {
+    flex-direction: column;
+  }
+}

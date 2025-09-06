@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import HorizontalCard from './HorizontalCard';
 import { useSetRecoilState } from 'recoil';
@@ -27,7 +27,7 @@ export default function Rated({ rated ,title, isRated }) {
             <div className='bg-black w-full flex flex-col justify-center items-center gap-4 pt-4 pb-5'>
                 {
                     rated.map((data,index)=>
-                        <HorizontalCard key={data.id} rank={index+1} id={data.id} compName={title} title={data.title} posterPath={data.posterPath} overview={data.overview} rating={data.rating.toString()} users={data.users} popularity={data.popularity.toString()} genres={data.genres} languages={data.languages} releaseDate={data.releaseDate} runtime={data.runtime}/>
+                        <HorizontalCard key={data.id} rank={index+1} isUpcoming={false} isAnime={title == "Anime" ? true : false} id={data.id} compName={title} item={data}/>
                     )
                 }
             </div>

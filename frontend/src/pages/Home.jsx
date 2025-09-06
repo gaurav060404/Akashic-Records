@@ -1,17 +1,17 @@
-import React from 'react'
 import Carousel from '../components/Carousel'
 import List from '../components/List'
 import { useRecoilValueLoadable } from 'recoil';
-import { allStateSelector, carouselPosters, popularMovies, popularSeriesSelector} from '../store/store';
+import { allStateSelector, carouselPosters, upcomingAnimes, upcomingMovies, upcomingSeries} from '../store/store';
 import Companies from '../components/Companies';
 
 export default function Home() {
   const trending = useRecoilValueLoadable(allStateSelector);
   const images = useRecoilValueLoadable(carouselPosters);
-  const popularMovie = useRecoilValueLoadable(popularMovies);
-  const popularSeries = useRecoilValueLoadable(popularSeriesSelector);
+  const upcomingMovie = useRecoilValueLoadable(upcomingMovies);
+  const upcomingShows = useRecoilValueLoadable(upcomingSeries);
+  const upcomingAnime = useRecoilValueLoadable(upcomingAnimes);
 
-  const loadables = [trending,images,popularMovie,popularSeries];
+  const loadables = [trending,images,upcomingMovie,upcomingShows,upcomingAnime];
 
   if (loadables.some(l=> l.state === 'loading')) {
     return <div className='h-screen flex justify-center items-center bg-black'>
@@ -33,13 +33,6 @@ export default function Home() {
     )
   }
 
-  const movies   = popularMovie.contents;
-  const series   = popularSeries.contents;
-
-  // debug
-  console.log('Movies:', movies);
-  console.log('Series:', series);
-
   if (loadables.every(l=>l.state === 'hasValue')) {
     return (
       <div className='w-full h-full absolute'>
@@ -52,8 +45,9 @@ export default function Home() {
         </div>
         <List key="trending" title="" poster={trending.contents} isUpcoming={false}/>
         <Companies />
-        <List key="popularMoviesList" title="Movies" poster={popularMovie.contents} isUpcoming={true}/>
-        <List key="popularSeriesList" title="Series" poster={popularSeries.contents} isUpcoming={true}/>
+        <List key="upcomingMoviesList" title="Movies" poster={upcomingMovie.contents} isUpcoming={true}/>
+        <List key="upcomingSeriesList" title="Series" poster={upcomingShows.contents} isUpcoming={true}/>
+        <List key="upcomingAnimesList" title="Animes" poster={upcomingAnime.contents} isUpcoming={true} isAnime={true}/>
       </div>
     )
   }
