@@ -11,6 +11,7 @@ const app = express();
 // Middleware
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5173/signup",
   "https://your-frontend.vercel.app"
 ];
 
@@ -56,7 +57,13 @@ passport.use(new GoogleStrategy(googleConfig,
   }
 ));
 
-// Routes
-app.use('/auth', authRoutes);
+// Mount routes
+app.use('/api/auth', authRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
 
 export default app;
