@@ -1,6 +1,9 @@
-# Records Of Akasha (Frontend)
+# Akashic Records 
 
 Lightweight React + Vite frontend that aggregates Movies, TV shows and Anime using TheMovieDB (TMDb) API.
+
+<img width="1897" height="867" alt="akashicrecords" src="https://github.com/user-attachments/assets/083f5949-50a0-4c5a-bad3-eaf486ec67d2" />
+
 
 ## Tech stack
 - React (Vite)
@@ -9,7 +12,7 @@ Lightweight React + Vite frontend that aggregates Movies, TV shows and Anime usi
 - Tailwind CSS for styles
 - React Router for navigation
 
-## Quick start (Windows)
+## Quick start 
 1. Install dependencies
    - PowerShell / CMD:
      npm install
