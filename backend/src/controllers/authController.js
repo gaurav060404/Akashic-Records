@@ -71,5 +71,22 @@ export const googleCallback = (req, res) => {
         expiresIn: jwtConfig.expiresIn
     });
 
-    res.redirect(`${process.env.FRONTEND_URL}?token=${token}`);
+    // Include user data in the redirect
+    const userData = {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        avatar: req.user.avatar || req.user.picture // Google might use 'picture' field
+    };
+
+    res.redirect(`${process.env.FRONTEND_URL}?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
+};
+
+export const getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user profile', error: error.message });
+    }
 };
