@@ -90,3 +90,56 @@ export const getProfile = async (req, res) => {
         res.status(500).json({ message: 'Error fetching user profile', error: error.message });
     }
 };
+
+// Get user's watchlist
+export const getWatchlist = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.status(200).json({ watchlist: user.watchlist || [] });
+  } catch (error) {
+    console.error("Error fetching watchlist:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Add/remove item from watchlist
+export const toggleWatchlistItem = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    const item = req.body;
+    
+    // Check if item already exists in watchlist
+    const itemIndex = user.watchlist.findIndex(
+      watchItem => watchItem.id === item.id
+    );
+    
+    let message;
+    if (itemIndex > -1) {
+      // Remove item
+      user.watchlist.splice(itemIndex, 1);
+      message = "Item removed from watchlist";
+    } else {
+      // Add item
+      user.watchlist.push(item);
+      message = "Item added to watchlist";
+    }
+    
+    await user.save();
+    res.status(200).json({ 
+      message, 
+      watchlist: user.watchlist,
+      isInWatchlist: itemIndex === -1 // true if item was just added
+    });
+  } catch (error) {
+    console.error("Error updating watchlist:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
