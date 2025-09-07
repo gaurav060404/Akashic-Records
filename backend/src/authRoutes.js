@@ -1,6 +1,6 @@
 import express from 'express';
 import passport from 'passport';
-import { login, signup, logout, googleCallback } from './controllers/authController.js';
+import { login, signup, logout, googleCallback, getWatchlist, toggleWatchlistItem } from './controllers/authController.js';
 import { authenticateToken } from './middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -24,5 +24,8 @@ router.get('/google/callback',
   }),
   googleCallback
 );
+
+router.get('/watchlist', authenticateToken, getWatchlist);
+router.post('/watchlist/toggle', authenticateToken, toggleWatchlistItem);
 
 export default router;
