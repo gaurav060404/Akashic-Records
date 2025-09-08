@@ -24,23 +24,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  watchlist: [
-    {
-      id: String,
-      posterName: String,
-      title: String,
-      posterPath: String,
-      backDropPath: String,
-      overview: String,
-      rating: mongoose.Schema.Types.Mixed,
-      releaseDate: String,
-      genres: Array,
-      type: String,
-      trailer: String,
-      credits: Array,
-      isAnime: Boolean
-    }
-  ],
+  watchlist: {
+    type: [mongoose.Schema.Types.Mixed], 
+    default: []
+  }
 });
 
 userSchema.pre('save', async function(next) {

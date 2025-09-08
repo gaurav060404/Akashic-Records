@@ -110,36 +110,31 @@ export const getWatchlist = async (req, res) => {
 export const toggleWatchlistItem = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    
+    if (!user) return res.status(404).json({ message: "User not found" });
+
     const item = req.body;
-    
-    // Check if item already exists in watchlist
-    const itemIndex = user.watchlist.findIndex(
-      watchItem => watchItem.id === item.id
-    );
-    
-    let message;
+    if (!user.watchlist) user.watchlist = [];
+
+    console.log(user.watchlist);
+
+    const itemIndex = user.watchlist.findIndex(w => w.id === item.id);
+
     if (itemIndex > -1) {
-      // Remove item
       user.watchlist.splice(itemIndex, 1);
-      message = "Item removed from watchlist";
+      var message = "Item removed from watchlist";
     } else {
-      // Add item
       user.watchlist.push(item);
-      message = "Item added to watchlist";
+      var message = "Item added to watchlist";
     }
-    
+
     await user.save();
-    res.status(200).json({ 
-      message, 
+    res.status(200).json({
+      message,
       watchlist: user.watchlist,
-      isInWatchlist: itemIndex === -1 // true if item was just added
+      isInWatchlist: itemIndex === -1
     });
   } catch (error) {
     console.error("Error updating watchlist:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
