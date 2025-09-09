@@ -34,8 +34,6 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
     ? item.posterPath
     : `https://image.tmdb.org/t/p/w220_and_h330_face${item.posterPath}`;
 
-    console.log(item);
-
   const handleOnClick = () => {
     const encodedPosterName = encodeURIComponent(posterTitle);
 

@@ -1,17 +1,64 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import { useRecoilState } from "recoil";
+import { watchlistState } from "../store/store.jsx";
+import { toggleWatchlistItem } from "../services/watchlistService.js";
+import { toast } from "react-hot-toast"; 
 
 export default function Details() {
   const location = useLocation();
   const poster = location.state?.poster || null;
   const [showFullOverview, setShowFullOverview] = useState(false);
-
-  console.log(poster);
+  const [watchlist, setWatchlist] = useRecoilState(watchlistState);
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    
+    // Check if the current item is already in the watchlist
+    if (poster && watchlist.some(item => item.id === poster.id)) {
+      setIsInWatchlist(true);
+    } else {
+      setIsInWatchlist(false);
+    }
+  }, [poster, watchlist]);
+
+  const handleWatchlistToggle = async () => {
+    if (!poster) return;
+    
+    try {
+      setLoading(true);
+      
+      // Update backend
+      const token = localStorage.getItem("token");
+      if (token) {
+        const result = await toggleWatchlistItem(poster);
+        
+        // Update local state to match backend response
+        setWatchlist(result.watchlist);
+        setIsInWatchlist(result.isInWatchlist);
+        
+        // Show success message
+        toast.success(result.message);
+      } else {
+        // Fallback to local-only toggle if not logged in
+        if (isInWatchlist) {
+          setWatchlist(watchlist.filter(item => item.id !== poster.id));
+          setIsInWatchlist(false);
+        } else {
+          setWatchlist([...watchlist, poster]);
+          setIsInWatchlist(true);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to update watchlist:", error);
+      toast.error("Failed to update watchlist. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!poster) {
     return (
@@ -171,13 +218,28 @@ export default function Details() {
 
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-3">
-                    <button onClick={() => handleUrl(poster.trailer)} className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
+                    <button 
+                      onClick={() => handleUrl(poster.trailer)} 
+                      className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
+                    >
                       <span>▶</span>
                       Watch Trailer
                     </button>
-                    <button className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 flex items-center gap-2">
-                      <span>+</span>
-                      Add to Watchlist
+                    <button
+                      onClick={handleWatchlistToggle}
+                      disabled={loading}
+                      className={`${
+                        isInWatchlist 
+                          ? "bg-green-600/80 hover:bg-green-700 border-green-500/30" 
+                          : "bg-white/10 hover:bg-white/20 border-white/20"
+                      } backdrop-blur-sm border text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 flex items-center gap-2`}
+                    >
+                      {loading ? (
+                        <span className="inline-block w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></span>
+                      ) : (
+                        <span>{isInWatchlist ? "✓" : "+"}</span>
+                      )}
+                      {isInWatchlist ? "Added to Watchlist" : "Add to Watchlist"}
                     </button>
                   </div>
                 </div>

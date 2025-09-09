@@ -21,7 +21,7 @@ const Signup = () => {
   const postersLoadable = useRecoilValueLoadable(carouselPosters);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Form data state
   const [formData, setFormData] = useState({
     name: '',
@@ -40,7 +40,6 @@ const Signup = () => {
   // Handle Google sign up
   const handleGoogleSignup = () => {
     window.location.href = `${import.meta.env.VITE_BACKEND_URL}/google`;
-    console.log("Redirecting to:", `${import.meta.env.VITE_BACKEND_URL}/google`);
   };
 
   // Handle form submission
@@ -48,26 +47,27 @@ const Signup = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
-      console.log("With data:", formData);
-      
       const response = await api.post('/signup', formData);
-      
-      console.log("Signup response:", response.data);
-      
+
       // Store token
       localStorage.setItem('token', response.data.token);
-      
-      // Redirect to home/dashboard page
+
+      const userData = {
+        name: response.data.user.name,  // Fixed: was data.user.name
+        avatar: response.data.user.avatar,  // Fixed: was data.user.avatar
+        id: response.data.user.id  // Fixed: was data.user.id
+      };
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      // Redirect to home page
       navigate('/');
     } catch (err) {
       console.error('Full signup error:', err);
-      // Check if it's a network error
       if (!err.response) {
         setError('Network error. Please check your connection.');
       } else {
-        // Axios wraps the error response in err.response
         const errorMessage = err.response?.data?.message || 'Something went wrong. Please try again.';
         setError(errorMessage);
       }
@@ -79,11 +79,11 @@ const Signup = () => {
   // Rotate through posters every 5 seconds
   useEffect(() => {
     if (postersLoadable.state !== 'hasValue' || postersLoadable.contents.length === 0) return;
-    
+
     const interval = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % postersLoadable.contents.length);
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, [postersLoadable.state, postersLoadable.contents]);
 
@@ -175,7 +175,7 @@ const Signup = () => {
 
           {/* Show error message if any */}
           {error && (
-            <div className="error-message bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <div className="error-message text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
               {error}
             </div>
           )}
@@ -183,25 +183,25 @@ const Signup = () => {
           <form className="signup-form" onSubmit={handleSignUp}>
             <div className="name-row">
               <div className="input-group">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Name" 
-                  required 
+                  placeholder="Name"
+                  required
                 />
               </div>
             </div>
 
             <div className="input-group">
-              <input 
-                type="email" 
+              <input
+                type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Email" 
-                required 
+                placeholder="Email"
+                required
               />
               <div className="email-icon">
                 <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -241,8 +241,8 @@ const Signup = () => {
             </div>
 
             <div className="social-login">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="google-btn"
                 onClick={handleGoogleSignup}
               >
