@@ -2,10 +2,29 @@ import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import { useRecoilState } from "recoil";
 import { slideIndex } from "../store/store";
+import { Link } from "react-router-dom";
 
 export default function Carousel({ images }) {
   const [slide, setSlide] = useRecoilState(slideIndex);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      setIsLoggedIn(!!(token && userData));
+    };
+
+    // Check on mount
+    checkAuthStatus();
+
+    // Listen for storage changes (when user logs in/out in another tab)
+    window.addEventListener('storage', checkAuthStatus);
+
+    return () => window.removeEventListener('storage', checkAuthStatus);
+  }, []);
 
   useEffect(() => {
     if (images.length === 0) return;
@@ -79,20 +98,27 @@ export default function Carousel({ images }) {
           The ultimate archive for your favorite Movies, TV Shows, and Anime.
         </p>
 
-        <div
-          className={`flex gap-4 flex-wrap transition-all duration-700 ease-out delay-200 ${isTransitioning
-              ? "translate-y-2 opacity-80"
-              : "translate-y-0 opacity-100"
-            }`}
-        >
-          <button className="rounded-lg bg-white h-12 text-black font-custom4 text-base px-8 shadow-md hover:bg-green-500 hover:text-white hover:scale-105 transition-transform duration-300">
-            Login
-          </button>
+        {/* Conditionally render buttons only if user is not logged in */}
+        {!isLoggedIn && (
+          <div
+            className={`flex gap-4 flex-wrap transition-all duration-700 ease-out delay-200 ${isTransitioning
+                ? "translate-y-2 opacity-80"
+                : "translate-y-0 opacity-100"
+              }`}
+          >
+            <Link to={'/login'}>
+              <button className="rounded-lg bg-white h-12 text-black font-custom4 text-base px-8 shadow-md hover:bg-green-500 hover:text-white hover:scale-105 transition-transform duration-300">
+                Login
+              </button>
+            </Link>
 
-          <button className="rounded-lg h-12 border-2 border-white text-white font-custom4 text-base px-8 shadow-md hover:bg-green-500 hover:text-white hover:scale-105 transition-transform duration-300">
-            Signup
-          </button>
-        </div>
+            <Link to={'/signup'}>
+              <button className="rounded-lg h-12 border-2 border-white text-white font-custom4 text-base px-8 shadow-md hover:bg-green-500 hover:text-white hover:scale-105 transition-transform duration-300">
+                Signup
+              </button>
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Movie Name - Bottom Right */}

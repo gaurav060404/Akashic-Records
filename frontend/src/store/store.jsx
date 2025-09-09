@@ -1192,4 +1192,9 @@ export const searchResults = selectorFamily({
   },
 });
 
+export const watchlistState = atom({
+  key: "watchlistState",
+  default: [],
+});
+
 

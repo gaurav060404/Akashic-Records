@@ -1,13 +1,36 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import logo from '../assets/logo.png'
-import { Link, useLocation } from 'react-router-dom'
-import { FaSearch, FaUserCircle } from 'react-icons/fa'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { FaSearch, FaUserCircle, FaSignOutAlt, FaUserAlt, FaChevronDown } from 'react-icons/fa'
 import Search from './Search';
+import defaultAvatar from '../assets/default-avatar.png';
 
 export default function Navbar({ isHomePage, hasBg }) {
   const [scrolled, setScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Check authentication status on mount and when location changes
+  useEffect(() => {
+    checkAuthStatus();
+  }, [location]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Track scroll position to add background when scrolling
   useEffect(() => {
@@ -20,8 +43,46 @@ export default function Navbar({ isHomePage, hasBg }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Check if user is logged in
+  const checkAuthStatus = () => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+
+    if (token && userData) {
+      setIsLoggedIn(true);
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Failed to parse user data', error);
+        // Handle corrupted data by clearing it
+        localStorage.removeItem('user');
+        setIsLoggedIn(false);
+        setUser(null);
+      }
+    } else {
+      setIsLoggedIn(false);
+      setUser(null);
+    }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    setUser(null);
+    setDropdownOpen(false);
+    navigate('/');
+  };
+
   // Determine active link
   const isActive = (path) => location.pathname === path;
+
+  // Toggle profile dropdown
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
 
   return (
     <>
@@ -61,6 +122,7 @@ export default function Navbar({ isHomePage, hasBg }) {
 
           {/* Right section - Search and Account */}
           <div className="flex items-center gap-5">
+            {/* Search button */}
             <button 
               className="text-white hover:text-orange-400 transition-colors"
               onClick={() => setIsSearchOpen(true)}
@@ -68,19 +130,71 @@ export default function Navbar({ isHomePage, hasBg }) {
               <FaSearch className="text-xl" />
             </button>
 
-            <Link
-              to="/signup"
-              className={`
-                flex items-center gap-2 px-5 py-2 rounded-full font-medium
-                ${isActive("/signup")
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-white/10 hover:bg-white/20 text-white hover:text-white'}
-                transition-all duration-300 backdrop-blur-sm
-              `}
-            >
-              <FaUserCircle />
-              <span className="hidden sm:inline">Sign Up</span>
-            </Link>
+            {/* Conditional rendering based on authentication */}
+            {isLoggedIn ? (
+              <div className="relative" ref={dropdownRef}>
+                {/* Profile display that triggers dropdown */}
+                <button
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300"
+                  onClick={toggleDropdown}
+                >
+                  <img
+                    src={user?.avatar || defaultAvatar}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full object-cover border border-orange-400"
+                    onError={(e) => {
+                      console.log('Avatar failed to load, using default');
+                      e.target.src = defaultAvatar;
+                    }}
+                  />
+                  <span className="hidden sm:inline text-white font-medium">{user?.name || 'User'}</span>
+                  <FaChevronDown className={`text-xs text-white transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown menu */}
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 py-2 bg-gray-900 rounded-md shadow-xl z-50 border border-gray-800">
+                    <Link 
+                      to="/profile" 
+                      className="flex items-center px-4 py-2 text-white hover:bg-gray-800 transition-colors"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <FaUserAlt className="mr-2" />
+                      My Profile
+                    </Link>
+                    <button 
+                      onClick={handleLogout}
+                      className="flex items-center w-full text-left px-4 py-2 text-white hover:bg-gray-800 transition-colors"
+                    >
+                      <FaSignOutAlt className="mr-2" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/login"
+                  className="text-white hover:text-orange-400 transition-colors px-3 py-2"
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/signup"
+                  className={`
+                    flex items-center gap-2 px-5 py-2 rounded-full font-medium
+                    ${isActive("/signup")
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white/10 hover:bg-white/20 text-white hover:text-white'}
+                    transition-all duration-300 backdrop-blur-sm
+                  `}
+                >
+                  <FaUserCircle />
+                  <span className="hidden sm:inline">Sign Up</span>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -88,7 +202,7 @@ export default function Navbar({ isHomePage, hasBg }) {
       {/* Add Search component */}
       <Search isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
-  )
+  );
 }
 
 // NavLink component for consistent styling
@@ -113,5 +227,5 @@ function NavLink({ children, to, isActive }) {
         `}></span>
       </Link>
     </li>
-  )
+  );
 }

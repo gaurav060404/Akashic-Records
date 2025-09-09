@@ -3,28 +3,89 @@ import { useRecoilValueLoadable } from 'recoil';
 import { carouselPosters } from '../store/store.jsx';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../index.css';
 import logo from '../assets/logo.png';
 
+// Create axios instance with base URL and default configs
+const api = axios.create({
+  baseURL: import.meta.env.VITE_BACKEND_URL || 'https://akashic-records-backend.vercel.app/api/auth',
+  withCredentials: true,
+});
+
 const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const postersLoadable = useRecoilValueLoadable(carouselPosters);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
-  function handleLogin(e) {
+  // Form data state
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+
+  // Handle form data changes
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // Handle Google login
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/google`;
+  };
+
+  // Handle login submission
+  async function handleLogin(e) {
     e.preventDefault();
-    console.log("Login clicked");
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await api.post('/login', formData);
+
+      console.log(response.data);
+
+      // Store token
+      localStorage.setItem('token', response.data.token);
+
+      const userData = {
+        name: response.data.user.name,
+        avatar: response.data.user.avatar,
+        // other user properties...
+        id: response.data.user.id
+      };
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      // Redirect to home/dashboard page
+      navigate('/');
+    } catch (err) {
+      console.error('Login error:', err);
+      if (!err.response) {
+        setError('Network error. Please check your connection.');
+      } else {
+        const errorMessage = err.response?.data?.message || 'Invalid email or password.';
+        setError(errorMessage);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   // Rotate through posters every 5 seconds
   useEffect(() => {
     if (postersLoadable.state !== 'hasValue' || postersLoadable.contents.length === 0) return;
-    
+
     const interval = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % postersLoadable.contents.length);
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, [postersLoadable.state, postersLoadable.contents]);
 
@@ -114,9 +175,23 @@ const Login = () => {
           <h1>Log in</h1>
           <p className="account-prompt">Don't have an account? <Link to="/signup">Sign up</Link></p>
 
+          {/* Show error message if any */}
+          {error && (
+            <div className="error-message text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              {error}
+            </div>
+          )}
+
           <form className="signup-form" onSubmit={handleLogin}>
             <div className="input-group">
-              <input type="email" placeholder="Email" required />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email"
+                required
+              />
               <div className="email-icon">
                 <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M18 0H2C0.9 0 0.00999999 0.9 0.00999999 2L0 14C0 15.1 0.9 16 2 16H18C19.1 16 20 15.1 20 14V2C20 0.9 19.1 0 18 0ZM18 4L10 9L2 4V2L10 7L18 2V4Z" fill="#A0A0A0" />
@@ -127,6 +202,9 @@ const Login = () => {
             <div className="input-group password-group">
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="Enter your password"
                 required
               />
@@ -146,8 +224,9 @@ const Login = () => {
             <button
               type="submit"
               className="create-account-btn"
+              disabled={isSubmitting}
             >
-              Log in
+              {isSubmitting ? 'Logging in...' : 'Log in'}
             </button>
 
             <div className="divider">
@@ -155,7 +234,11 @@ const Login = () => {
             </div>
 
             <div className="social-login">
-              <button type="button" className="google-btn">
+              <button
+                type="button"
+                className="google-btn"
+                onClick={handleGoogleLogin}
+              >
                 <svg viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
