@@ -10,9 +10,6 @@ const GoogleCallback = () => {
     const token = searchParams.get('token');
     const userData = searchParams.get('user');
 
-    console.log(token);
-    console.log(userData);
-
     if (token) {
       try {
         // Store token

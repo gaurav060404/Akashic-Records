@@ -87,6 +87,12 @@ export default function Search({ isOpen, onClose }) {
               <div
                 key={`${item.type}-${item.id}`}
                 onClick={() => handleItemClick(item)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleItemClick(item);
+                  }
+                }}
                 className="flex items-center gap-4 p-4 hover:bg-gray-800 transition-colors cursor-pointer"
               >
                 {item.poster ? (
