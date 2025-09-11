@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { useRecoilState } from "recoil";
@@ -7,6 +7,7 @@ import { toggleWatchlistItem } from "../services/watchlistService.js";
 import { toast } from "react-hot-toast"; 
 
 export default function Details() {
+  const navigate = useNavigate();
   const location = useLocation();
   const poster = location.state?.poster || null;
   const [showFullOverview, setShowFullOverview] = useState(false);
@@ -28,30 +29,61 @@ export default function Details() {
   const handleWatchlistToggle = async () => {
     if (!poster) return;
     
+    // Check if user is logged in
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // Show login prompt for non-authenticated users
+      toast(
+        (t) => (
+          <div className="flex flex-col items-center">
+            <p className="mb-2">Please log in to use the watchlist feature</p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  navigate("/login");
+                }}
+                className="px-3 py-1 bg-blue-600 rounded-md text-white text-sm font-medium"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  navigate("/signup");
+                }}
+                className="px-3 py-1 bg-green-600 rounded-md text-white text-sm font-medium"
+              >
+                Sign Up
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          duration: 5000,
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+            padding: '16px'
+          },
+        }
+      );
+      return;
+    }
+    
     try {
       setLoading(true);
       
       // Update backend
-      const token = localStorage.getItem("token");
-      if (token) {
-        const result = await toggleWatchlistItem(poster);
-        
-        // Update local state to match backend response
-        setWatchlist(result.watchlist);
-        setIsInWatchlist(result.isInWatchlist);
-        
-        // Show success message
-        toast.success(result.message);
-      } else {
-        // Fallback to local-only toggle if not logged in
-        if (isInWatchlist) {
-          setWatchlist(watchlist.filter(item => item.id !== poster.id));
-          setIsInWatchlist(false);
-        } else {
-          setWatchlist([...watchlist, poster]);
-          setIsInWatchlist(true);
-        }
-      }
+      const result = await toggleWatchlistItem(poster);
+      
+      // Update local state to match backend response
+      setWatchlist(result.watchlist);
+      setIsInWatchlist(result.isInWatchlist);
+      
+      // Show success message
+      toast.success(result.message);
     } catch (error) {
       console.error("Failed to update watchlist:", error);
       toast.error("Failed to update watchlist. Please try again.");
