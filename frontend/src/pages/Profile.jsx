@@ -13,6 +13,25 @@ export default function Profile() {
   const [user, setUser] = useState({ name: "User", avatar: "https://i.pravatar.cc/150?img=11" });
   const [loading, setLoading] = useState(false);
 
+  // Get user data including avatar on component mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setUser({
+          name: userData.name || "User",
+          avatar: userData.avatar || 
+                  userData.picture || 
+                  (userData.googleUser?.picture) || 
+                  "https://i.pravatar.cc/150?img=11"
+        });
+      } catch (error) {
+        console.error("Failed to parse user data:", error);
+      }
+    }
+  }, []);
+
   // Fetch watchlist from backend on component mount
   useEffect(() => {
     const syncWatchlist = async () => {
@@ -124,6 +143,7 @@ export default function Profile() {
     <div className="min-h-screen bg-[#050714] text-white">
       <Navbar isHomePage={false} hasBg={true} />
 
+      {/* Loading spinner */}
       {loading && (
         <div className="h-screen flex justify-center items-center bg-black">
           <button disabled type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center">
@@ -136,20 +156,26 @@ export default function Profile() {
         </div>
       )}
 
-      <div className="w-full bg-gradient-to-r from-[#0a1535] to-[#1e1040] pt-20 pb-8">
+      {/* User profile header */}
+      {!loading && <div className="w-full bg-gradient-to-r from-[#0a1535] to-[#1e1040] pt-20 pb-8">
         <div className="max-w-6xl mx-auto px-4 flex items-center">
           <div className="w-40 h-40 rounded-full overflow-hidden border-2 border-white/20 shadow-lg mr-8">
             <img
               src={user.avatar}
               alt="User profile"
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://i.pravatar.cc/150?img=11";
+              }}
             />
           </div>
 
           <div className="flex flex-col justify-center pt-4">
-            <h1 className="text-3xl font-custom4 font-bold mb-1">Welcome, User</h1>
+            <h1 className="text-3xl font-custom4 font-bold mb-1">Welcome, {user.name}</h1>
             <p className="text-gray-300 text-sm mb-6 mt-2 ml-1">Manage your watchlist</p>
 
+            {/* Stats */}
             <div className="stats flex gap-12">
               <div className="flex flex-col items-center">
                 <div className="text-4xl font-bold text-blue-400">{watchlist.length}</div>
@@ -176,7 +202,7 @@ export default function Profile() {
             </div>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* Content Section */}
       <div className="max-w-6xl mx-auto py-12 px-4">
