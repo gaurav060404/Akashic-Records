@@ -2,7 +2,9 @@
 
 Lightweight React + Vite frontend that aggregates Movies, TV shows and Anime using TheMovieDB (TMDb) API.
 
-<img width="1897" height="867" alt="akashicrecords" src="https://github.com/user-attachments/assets/083f5949-50a0-4c5a-bad3-eaf486ec67d2" />
+<img width="1897" height="868" alt="image" src="https://github.com/user-attachments/assets/f3fceeec-3dec-4e9a-b699-5a71fefddbab" />
+<img width="1898" height="863" alt="image" src="https://github.com/user-attachments/assets/695c6272-15c3-455a-9f16-f8a3d0ad2918" />
+<img width="1899" height="867" alt="image" src="https://github.com/user-attachments/assets/56679a01-fb2e-482f-b118-12de1d21dc2b" />
 
 
 ## Tech stack
