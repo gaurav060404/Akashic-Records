@@ -1,9 +1,10 @@
 import Carousel from '../components/Carousel'
 import List from '../components/List'
 import { useRecoilValueLoadable } from 'recoil';
-import { allStateSelector, carouselPosters, upcomingAnimes, upcomingMovies, upcomingSeries} from '../store/store';
+import { allStateSelector, carouselPosters, upcomingAnimes, upcomingMovies, upcomingSeries } from '../store/store';
 import Companies from '../components/Companies';
 import Footer from '../components/Footer'; 
+import TopDirectors from '../components/TopDirectors';
 
 export default function Home() {
   const trending = useRecoilValueLoadable(allStateSelector);
@@ -48,11 +49,11 @@ export default function Home() {
           <List key="trending" title="" poster={trending.contents} isUpcoming={false}/>
           <Companies />
           <List key="upcomingMoviesList" title="Movies" poster={upcomingMovie.contents} isUpcoming={true}/>
+          <TopDirectors />
           <List key="upcomingSeriesList" title="Series" poster={upcomingShows.contents} isUpcoming={true}/>
           <List key="upcomingAnimesList" title="Animes" poster={upcomingAnime.contents} isUpcoming={true} isAnime={true}/>
         </div>
         
-        {/* Add the Footer component */}
         <Footer />
       </div>
     )
