@@ -205,7 +205,7 @@ export default function Profile() {
       </div>}
 
       {/* Content Section */}
-      <div className="max-w-6xl mx-auto py-12 px-4">
+      {!loading && <div className="max-w-6xl mx-auto py-12 px-4">
         <div className="flex justify-between items-center mb-10">
           <h2 className="text-4xl font-bold">My Watchlist</h2>
 
@@ -349,7 +349,7 @@ export default function Profile() {
             })}
           </motion.div>
         )}
-      </div>
+      </div>}
     </div>
   );
 }

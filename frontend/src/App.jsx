@@ -13,6 +13,8 @@ import { useEffect } from 'react';
 import axios from 'axios';
 import Profile from "./pages/Profile";
 import { Toaster } from 'react-hot-toast';
+import About from './pages/About.jsx';
+import FAQ from './pages/FAQ.jsx';
 
 export default function App() {
   useEffect(() => {
@@ -81,6 +83,8 @@ export default function App() {
         <Route path='/:category/rated/:id/:posterName' element={<Details/>} ></Route>
         <Route path='/google/callback' element={<GoogleCallback />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/faq" element={<FAQ />} />
         <Route path='*' element={<NotFound/>}></Route>
       </Routes>
       <Toaster 
