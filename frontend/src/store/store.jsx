@@ -1197,4 +1197,97 @@ export const watchlistState = atom({
   default: [],
 });
 
+export const topDirectorsSelector = selector({
+  key: "topDirectorsSelector",
+  get: async ({ get }) => {
+    // Get the trending data from the existing selector
+    const allData = get(allStateSelector);
+    
+    if (!allData || allData.length === 0) {
+      return [];
+    }
+    
+    // Create a map to store director information
+    const directorsMap = new Map();
+    
+    allData.forEach(item => {
+      // Handle both array and string formats for directors
+      const directors = Array.isArray(item.director) 
+        ? item.director 
+        : typeof item.director === 'string' 
+          ? [item.director] 
+          : [];
+      
+      directors.forEach(director => {
+        if (director && director !== 'Unknown' && director !== 'N/A') {
+          if (directorsMap.has(director)) {
+            const directorData = directorsMap.get(director);
+            directorData.count++;
+            directorData.titles.push({
+              id: item.id,
+              title: item.posterName || item.title,
+              type: item.type || (item.runtime ? 'Movie' : 'Series'),
+              posterPath: item.posterPath || item.poster,
+              rating: item.rating
+            });
+          } else {
+            directorsMap.set(director, {
+              name: director,
+              count: 1,
+              profilePath: null, // Will be filled later
+              titles: [{
+                id: item.id,
+                title: item.posterName || item.title,
+                type: item.type || (item.runtime ? 'Movie' : 'Series'),
+                posterPath: item.posterPath || item.poster,
+                rating: item.rating
+              }]
+            });
+          }
+        }
+      });
+    });
+    
+    // Sort by count and get top 10 directors
+    const topDirectors = Array.from(directorsMap.values())
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+    
+    // Fetch profile images for top directors
+    const directorsWithImages = await Promise.all(
+      topDirectors.map(async (director) => {
+        try {
+          // Search for the director in TMDB
+          const searchResult = await axios.get(
+            "https://api.themoviedb.org/3/search/person",
+            {
+              params: {
+                api_key: import.meta.env.VITE_SECRET_KEY,
+                query: director.name,
+                include_adult: false,
+              },
+            }
+          );
+          
+          // Find the best match
+          const bestMatch = searchResult.data.results.find(
+            person => person.known_for_department === "Directing"
+          ) || searchResult.data.results[0];
+          
+          if (bestMatch && bestMatch.profile_path) {
+            director.profilePath = bestMatch.profile_path;
+          }
+          
+          return director;
+        } catch (error) {
+          console.error(`Error fetching profile for ${director.name}:`, error);
+          return director;
+        }
+      })
+    );
+    
+    return directorsWithImages;
+  }
+});
+
 
