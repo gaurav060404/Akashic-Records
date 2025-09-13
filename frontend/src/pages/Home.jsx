@@ -1,9 +1,14 @@
 import Carousel from '../components/Carousel'
 import List from '../components/List'
-import { useRecoilValueLoadable } from 'recoil';
-import { allStateSelector, carouselPosters, upcomingAnimes, upcomingMovies, upcomingSeries} from '../store/store';
+import { useRecoilValueLoadable, useRecoilState } from 'recoil';
+import { allStateSelector, carouselPosters, upcomingAnimes, upcomingMovies, upcomingSeries, watchlistState } from '../store/store';
 import Companies from '../components/Companies';
-import Footer from '../components/Footer'; 
+import Footer from '../components/Footer';
+import Welcome from '../components/Welcome';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { fetchWatchlist } from '../services/watchlistService.js';
+import Navbar from '../components/Navbar';
 
 export default function Home() {
   const trending = useRecoilValueLoadable(allStateSelector);
@@ -11,10 +16,38 @@ export default function Home() {
   const upcomingMovie = useRecoilValueLoadable(upcomingMovies);
   const upcomingShows = useRecoilValueLoadable(upcomingSeries);
   const upcomingAnime = useRecoilValueLoadable(upcomingAnimes);
+  const [watchlist, setWatchlist] = useRecoilState(watchlistState);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const loadables = [trending,images,upcomingMovie,upcomingShows,upcomingAnime];
+  const loadables = [trending, images, upcomingMovie, upcomingShows, upcomingAnime];
 
-  if (loadables.some(l=> l.state === 'loading')) {
+  // Check if user is logged in and fetch watchlist
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    
+    if (token && user) {
+      setIsLoggedIn(true);
+      
+      // Fetch user's watchlist
+      const getWatchlist = async () => {
+        try {
+          const result = await fetchWatchlist();
+          if (result && result.watchlist) {
+            setWatchlist(result.watchlist);
+          }
+        } catch (error) {
+          console.error("Error fetching watchlist:", error);
+        }
+      };
+      
+      getWatchlist();
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [setWatchlist]);
+
+  if (loadables.some(l => l.state === 'loading')) {
     return <div className='h-screen flex justify-center items-center bg-black'>
       <button disabled type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center">
         <svg aria-hidden="true" role="status" className="inline w-4 h-4 me-3 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -26,19 +59,74 @@ export default function Home() {
     </div>
   }
 
-  if(loadables.some(l => l.state === 'hasError')){
-    return(
+  if (loadables.some(l => l.state === 'hasError')) {
+    return (
       <div className='h-screen flex items-start justify-center bg-black text-white'>
         Oops!! Something Went Wrong
       </div>
     )
   }
 
-  if (loadables.every(l=>l.state === 'hasValue')) {
+  if (loadables.every(l => l.state === 'hasValue')) {
     return (
       <div className='flex flex-col min-h-screen'>
         <div className='flex-grow'>
-          <Carousel images={images.contents}/>
+          <Navbar isHomePage={true} hasBg={false} />
+          
+          {/* Welcome component */}
+          <Welcome />
+          
+          {/* User's Watchlist Section - Only show if logged in and has items */}
+          {isLoggedIn && watchlist.length > 0 && (
+            <div className="bg-gradient-to-r from-[#0a1535] to-[#1e1040] py-8">
+              <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-white">Continue Watching</h2>
+                  <Link to="/profile" className="text-blue-400 hover:text-blue-300 transition-colors text-sm">
+                    View All
+                  </Link>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <div className="flex space-x-4 pb-4">
+                    {watchlist.slice(0, 6).map(item => (
+                      <Link 
+                        to={`/details/${item.id}`} 
+                        state={{ poster: item }} 
+                        key={item.id}
+                        className="flex-shrink-0 w-48 group"
+                      >
+                        <div className="relative rounded-lg overflow-hidden">
+                          <img 
+                            src={item.isAnime ? item.posterPath : `https://image.tmdb.org/t/p/w500${item.posterPath}`} 
+                            alt={item.posterName || item.title} 
+                            className="w-48 h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
+                            <span className="text-white font-medium">View Details</span>
+                          </div>
+                          {/* Play Button Overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="bg-blue-600/80 rounded-full p-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                        <h3 className="mt-2 text-white font-medium truncate">
+                          {item.posterName || item.title}
+                        </h3>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <Carousel posters={images.contents} />
           <div className='text-white bg-black flex items-center justify-center'>
             <p className='py-6 px-3 font-custom4'>The all in one website for Pop Culture.</p>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -52,7 +140,6 @@ export default function Home() {
           <List key="upcomingAnimesList" title="Animes" poster={upcomingAnime.contents} isUpcoming={true} isAnime={true}/>
         </div>
         
-        {/* Add the Footer component */}
         <Footer />
       </div>
     )
