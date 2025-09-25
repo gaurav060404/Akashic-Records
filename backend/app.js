@@ -11,7 +11,8 @@ const app = express();
 // Middleware
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://akashicrecords.vercel.app"
+  "https://akashicrecords.vercel.app",
+  "https://akashicrecords.gouravsingh.dev"
 ];
 
 app.use(
