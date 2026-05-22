@@ -1,19 +1,6 @@
 {
   "name": "backend",
   "version": "1.0.0",
-<<<<<<< HEAD
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "backend": "file:"
-  }
-=======
   "description": "Backend for the project with OAuth authentication",
   "main": "index.js",
   "type": "module",
@@ -39,5 +26,4 @@
   "keywords": [],
   "author": "",
   "license": "ISC"
->>>>>>> 2e8d3b094b025a04ee38a06bd34f56bdbc983833
 }
