@@ -1,11 +1,11 @@
 import React from 'react'
 import Navbar from './components/Navbar'
 import Carousel from './components/Carousel'
-import img1 from './assets/img1.jpg'
+import img1 from './assets/img5.jpg'
 import img2 from './assets/img2.jpg'
 import img3 from './assets/img3.jpg'
 import img4 from './assets/img4.jpg'
-import blackblurr from './assets/blurr1.png'
+import blackblurr from './assets/blurr2.png'
 
 const slides = [
   img1, img2, img3, img4
@@ -14,14 +14,14 @@ const slides = [
 export default function App() {
   return (
     <div className='bg-black h-screen flex justify-center m-0 p-0'>
-      <div className='relative bg-white max-w-full h-3/4 m-0 p-0'>
+      <div className='relative bg-white max-w-full h-screen m-0 p-0'>
       <div className='absolute -top-4 left-0 pl-96 w-full z-10'>
         <Navbar/>
       </div>
         <Carousel>
           {
             slides.map((s,index)=>(
-              <img key={index} src={s} alt="" className='w-full h-full object-contain object-center'/>
+              <img key={index} src={s} alt={`Slide ${index + 1}`} className='w-full h-full object-cover'/>
             ))
           }
         </Carousel>
