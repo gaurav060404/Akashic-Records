@@ -158,11 +158,11 @@ export const upcomingMovies = asyncHandler(async (req, res) => {
     },
   });
 
-  const upcomingMovies = result.data.results.map((show) => ({
-    id: show.id,
-    title: show.name,
+  const upcomingMovies = result.data.results.map((movie) => ({
+    id: movie.id,
+    title: movie.title,
     type: 'movie',
-    poster: show.poster_path,
+    poster: movie.poster_path,
   }));
 
   cache.set(cacheKey, upcomingMovies, 3600);
@@ -305,3 +305,50 @@ export const topCreators = asyncHandler(async (req, res) => {
       new ApiResponse(200, topCreators, 'Top creators fetched successfully'),
     );
 });
+
+export const trendingMovies = asyncHandler(
+  async (req, res) => {
+
+    const cacheKey = "trending-movies";
+
+    // Check cache
+    const cachedData = cache.get(cacheKey);
+
+    if (cachedData) {
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          cachedData,
+          "Trending movies fetched from cache"
+        )
+      );
+    }
+
+    const result = await axiosInstance.get(
+      "/trending/movie/week"
+    );
+
+    const movies =
+      result.data.results.map((movie) => ({
+        id: movie.id,
+        title: movie.title,
+        type: "movie",
+        poster: movie.poster_path
+      }));
+
+    // Cache for 10 mins
+    cache.set(
+      cacheKey,
+      movies,
+      600
+    );
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        movies,
+        "Trending movies fetched successfully"
+      )
+    );
+  }
+);
