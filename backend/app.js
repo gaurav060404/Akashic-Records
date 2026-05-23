@@ -4,6 +4,7 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { googleConfig } from './src/config/oauthConfig.js';
 import authRoutes from './src/authRoutes.js';
+import tmdbRoutes from './src/routes/tmdb.route.js';
 import User from './src/models/userModel.js';
 
 const app = express();
@@ -59,6 +60,7 @@ passport.use(new GoogleStrategy(googleConfig,
 
 // Mount routes
 app.use('/api/auth', authRoutes);
+app.use('/api/tmdb', tmdbRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
