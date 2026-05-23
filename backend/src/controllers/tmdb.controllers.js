@@ -306,49 +306,64 @@ export const topCreators = asyncHandler(async (req, res) => {
     );
 });
 
-export const trendingMovies = asyncHandler(
-  async (req, res) => {
+export const trendingMovies = asyncHandler(async (req, res) => {
+  const cacheKey = 'trending-movies';
 
-    const cacheKey = "trending-movies";
+  // Check cache
+  const cachedData = cache.get(cacheKey);
 
-    // Check cache
-    const cachedData = cache.get(cacheKey);
-
-    if (cachedData) {
-      return res.status(200).json(
-        new ApiResponse(
-          200,
-          cachedData,
-          "Trending movies fetched from cache"
-        )
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, cachedData, 'Trending movies fetched from cache'),
       );
-    }
-
-    const result = await axiosInstance.get(
-      "/trending/movie/week"
-    );
-
-    const movies =
-      result.data.results.map((movie) => ({
-        id: movie.id,
-        title: movie.title,
-        type: "movie",
-        poster: movie.poster_path
-      }));
-
-    // Cache for 10 mins
-    cache.set(
-      cacheKey,
-      movies,
-      600
-    );
-
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        movies,
-        "Trending movies fetched successfully"
-      )
-    );
   }
-);
+
+  const result = await axiosInstance.get('/trending/movie/week');
+
+  const movies = result.data.results.map((movie) => ({
+    id: movie.id,
+    title: movie.title,
+    type: 'movie',
+    poster: movie.poster_path,
+  }));
+
+  // Cache for 10 mins
+  cache.set(cacheKey, movies, 600);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, movies, 'Trending movies fetched successfully'));
+});
+
+export const trendingSeries = asyncHandler(async (req, res) => {
+  const cacheKey = 'trending-series';
+
+  // Check cache
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, cachedData, 'Trending series fetched from cache'),
+      );
+  }
+
+  const result = await axiosInstance.get('/trending/tv/week');
+
+  const shows = result.data.results.map((show) => ({
+    id: show.id,
+    title: show.name,
+    type: 'series',
+    poster: show.poster_path,
+  }));
+
+  // Cache for 10 mins
+  cache.set(cacheKey, shows, 600);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, shows, 'Trending movies fetched successfully'));
+});
