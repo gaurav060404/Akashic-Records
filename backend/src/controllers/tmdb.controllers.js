@@ -213,3 +213,95 @@ export const upcomingAnimes = asyncHandler(async (req, res) => {
       ),
     );
 });
+
+export const topCreators = asyncHandler(async (req, res) => {
+  const cacheKey = 'top-creators';
+
+  // Check cache
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, cachedData, 'Top creators fetched from cache'),
+      );
+  }
+
+  const result = await axiosInstance.get('/trending/all/week');
+
+  const filtered = result.data.results.filter(
+    (item) => item.media_type === 'movie' || item.media_type === 'tv',
+  );
+
+  const detailedItems = await Promise.all(
+    filtered.map(async (item) => {
+      // Movies
+      if (item.media_type === 'movie') {
+        const creditsRes = await axiosInstance.get(`/movie/${item.id}/credits`);
+
+        const directors = creditsRes.data.crew.filter(
+          (member) => member.job === 'Director',
+        );
+
+        return {
+          item,
+          creators: directors,
+        };
+      }
+
+      // TV Shows
+      else {
+        const tvRes = await axiosInstance.get(`/tv/${item.id}`);
+
+        return {
+          item,
+          creators: tvRes.data.created_by || [],
+        };
+      }
+    }),
+  );
+
+  // Aggregate creators
+  const creatorsMap = new Map();
+
+  detailedItems.forEach(({ item, creators }) => {
+    creators.forEach((creator) => {
+      if (!creator.id) return;
+
+      if (!creatorsMap.has(creator.id)) {
+        creatorsMap.set(creator.id, {
+          id: creator.id,
+          name: creator.name,
+          profile: creator.profile_path,
+          count: 0,
+          works: [],
+        });
+      }
+
+      const existing = creatorsMap.get(creator.id);
+      existing.count++;
+      existing.works.push({
+        id: item.id,
+        title: item.title || item.name,
+        type: item.media_type,
+        poster: item.poster_path,
+        rating: item.vote_average,
+      });
+    });
+  });
+
+  // Sort by popularity
+  const topCreators = Array.from(creatorsMap.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  // Cache for 1 hour
+  cache.set(cacheKey, topCreators, 3600);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, topCreators, 'Top creators fetched successfully'),
+    );
+});

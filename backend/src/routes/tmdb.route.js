@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   carouselPosters,
   getTrending,
+  topCreators,
   upcomingAnimes,
   upcomingMovies,
   upcomingSeries,
@@ -14,5 +15,6 @@ router.get('/trending', getTrending);
 router.get('/upcomingSeries', upcomingSeries);
 router.get('/upcomingMovies', upcomingMovies);
 router.get('/upcomingAnimes', upcomingAnimes);
+router.get('/top-creators', topCreators);
 
 export default router;
