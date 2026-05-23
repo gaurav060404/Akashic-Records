@@ -367,3 +367,39 @@ export const trendingSeries = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, shows, 'Trending movies fetched successfully'));
 });
+
+export const trendingAnimes = asyncHandler(async (req, res) => {
+  const cacheKey = 'trending-animes';
+
+  // Check cache
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, cachedData, 'Trending animes fetched from cache'),
+      );
+  }
+
+  const results = await axios.get('https://api.jikan.moe/v4/seasons/now');
+
+  const trendingAnimes = results.data.data.map((anime) => ({
+    id: anime.mal_id,
+    title: anime.title_english,
+    type: 'anime',
+    poster: anime.images.jpg.image_url,
+  }));
+
+  cache.set(cacheKey, trendingAnimes, 3600);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        trendingAnimes,
+        'Trending animes fetched successfully',
+      ),
+    );
+});

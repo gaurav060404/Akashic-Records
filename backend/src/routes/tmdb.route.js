@@ -3,6 +3,7 @@ import {
   carouselPosters,
   getTrending,
   topCreators,
+  trendingAnimes,
   trendingMovies,
   trendingSeries,
   upcomingAnimes,
@@ -20,5 +21,6 @@ router.get('/upcomingAnimes', upcomingAnimes);
 router.get('/top-creators', topCreators);
 router.get('/trending/movies', trendingMovies);
 router.get('/trending/series', trendingSeries);
+router.get('/trending/animes', trendingAnimes);
 
 export default router;
