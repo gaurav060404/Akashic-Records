@@ -198,7 +198,7 @@ export const upcomingAnimes = asyncHandler(async (req, res) => {
     id: anime.mal_id,
     title: anime.title_english,
     type: 'anime',
-    poster: anime.images.jpg.image_url,
+    poster: anime.images?.jpg?.large_image_url,
   }));
 
   cache.set(cacheKey, upcomingAnime, 3600);
@@ -388,7 +388,7 @@ export const trendingAnimes = asyncHandler(async (req, res) => {
     id: anime.mal_id,
     title: anime.title_english,
     type: 'anime',
-    poster: anime.images.jpg.image_url,
+    poster: anime.images?.jpg?.large_image_url,
   }));
 
   cache.set(cacheKey, trendingAnimes, 3600);
@@ -576,6 +576,211 @@ export const topRatedAnimes = asyncHandler(async (req, res) => {
         200,
         detailedAnime,
         'Top rated anime fetched successfully',
+      ),
+    );
+});
+
+export const trendingMangas = asyncHandler(async (req, res) => {
+  const cacheKey = 'trending-manga';
+
+  const snapshotKey = 'manga-chapter-snapshots';
+
+  // Check final trending cache
+  const cachedTrending = cache.get(cacheKey);
+
+  if (cachedTrending) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          cachedTrending,
+          'Trending manga fetched from cache',
+        ),
+      );
+  }
+
+  // Previous snapshot
+  const previousSnapshot = cache.get(snapshotKey) || {};
+
+  // Fetch publishing manga
+  const result = await axios.get('https://api.jikan.moe/v4/manga', {
+    params: {
+      status: 'publishing',
+      order_by: 'members',
+      sort: 'desc',
+      limit: 25,
+    },
+  });
+
+  const mangaList = result.data.data;
+
+  // Find highest members count
+  // used for popularity normalization
+  const maxMembers = Math.max(...mangaList.map((m) => m.members || 0));
+
+  // Store updated chapter counts
+  const newSnapshot = {};
+
+  const transformed = mangaList.map((manga) => {
+    const currentChapters = manga.chapters || 0;
+
+    const previousChapters = previousSnapshot[manga.mal_id] || 0;
+
+    // Detect chapter update
+    const updated =
+      previousChapters !== 0 && currentChapters > previousChapters;
+
+    // Save latest snapshot
+    newSnapshot[manga.mal_id] = currentChapters;
+
+    // Popularity score
+    // normalized between 0 → 20
+    const popularityScore = ((manga.members || 0) / maxMembers) * 20;
+
+    // Update score
+    // updated manga heavily prioritized
+    const updateScore = updated ? 80 : 0;
+
+    // Final weighted score
+    const trendingScore = updateScore + popularityScore;
+
+    return {
+      id: manga.mal_id,
+      title: manga.title,
+      type: 'manga',
+      poster: manga.images?.jpg?.large_image_url,
+      updated,
+      trendingScore: Number(trendingScore.toFixed(2)),
+    };
+  });
+
+  // Sort by weighted trending score
+  transformed.sort((a, b) => b.trendingScore - a.trendingScore);
+
+  // Return top 10 only
+  const finalTrending = transformed.slice(0, 10);
+
+  // Save chapter snapshot
+  cache.set(snapshotKey, newSnapshot, 86400);
+
+  // Cache final result
+  cache.set(cacheKey, finalTrending, 3600);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        finalTrending,
+        'Trending manga fetched successfully',
+      ),
+    );
+});
+
+export const topRatedMangas = asyncHandler(async (req, res) => {
+  const cacheKey = 'top-rated-mangas';
+
+  // Check cache
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, cachedData, 'Top rated mangas fetched from cache'),
+      );
+  }
+
+  // Fetch top rated manga
+  const result = await axios.get('https://api.jikan.moe/v4/top/manga', {
+    params: {
+      limit: 10,
+    },
+  });
+
+  const mangaList = result.data.data;
+
+  // Transform response
+  const transformed = mangaList.map((manga, index) => ({
+    rank: index + 1,
+    id: manga.mal_id,
+    title: manga.title,
+    type: 'manga',
+    overview: manga.synopsis,
+    poster: manga.images?.jpg?.large_image_url,
+    genres: manga.genres?.map((genre) => genre.name) || [],
+    chapters: manga.chapters,
+    volumes: manga.volumes,
+    rating: manga.score,
+    votes: manga.scored_by,
+    popularity: manga.popularity,
+    members: manga.members,
+    status: manga.status,
+    releaseDate: manga.published?.from,
+    authors: manga.authors?.map((author) => author.name) || [],
+    serializations:
+      manga.serializations?.map((serialization) => serialization.name) || [],
+  }));
+
+  // Cache for 2 hours
+  cache.set(cacheKey, transformed, 7200);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        transformed,
+        'Top rated mangas fetched successfully',
+      ),
+    );
+});
+
+export const recommendedMangas = asyncHandler(async (req, res) => {
+  const cacheKey = 'recommended-mangas';
+
+  // Check cache
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          cachedData,
+          'Recommended mangas fetched from cache',
+        ),
+      );
+  }
+
+  const result = await axios.get(
+    'https://api.jikan.moe/v4/recommendations/manga',
+  );
+
+  // Transform response
+  const recommendations = result.data.data.slice(0, 10).map((item, index) => {
+    const entry = item.entry?.[0];
+
+    return {
+      id: entry?.mal_id,
+      title: entry?.title,
+      type: 'manga',
+      poster: entry?.images?.jpg?.large_image_url,
+    };
+  });
+
+  // Cache for 2 hours
+  cache.set(cacheKey, recommendations, 7200);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        recommendations,
+        'Recommended mangas fetched successfully',
       ),
     );
 });
