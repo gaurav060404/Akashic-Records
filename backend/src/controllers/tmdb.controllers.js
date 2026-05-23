@@ -403,3 +403,67 @@ export const trendingAnimes = asyncHandler(async (req, res) => {
       ),
     );
 });
+
+export const topRatedMovies = asyncHandler(async (req, res) => {
+  const cacheKey = 'top-rated-movies';
+
+  // Check cache
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, cachedData, 'Top rated movies fetched from cache'),
+      );
+  }
+
+  const result = await axiosInstance.get('/movie/top_rated');
+
+  const top10 = result.data.results.slice(0, 10);
+
+  const detailedMovies = await Promise.all(
+    top10.map(async (movie) => {
+      const detailsRes = await axiosInstance.get(`/movie/${movie.id}`, {
+        params: {
+          append_to_response: 'credits,videos',
+        },
+      });
+
+      const details = detailsRes.data;
+
+      const director = details.credits?.crew?.find(
+        (member) => member.job === 'Director',
+      );
+
+      return {
+        id: details.id,
+        title: details.title,
+        type: 'movie',
+        overview: details.overview,
+        poster: details.poster_path,
+        genres: details.genres?.map((g) => g.name) || [],
+        runtime: details.runtime,
+        language: details.spoken_languages?.[0]?.english_name,
+        rating: details.vote_average,
+        votes: details.vote_count,
+        releaseDate: details.release_date,
+        director: director?.name || null,
+        popularity: details.popularity,
+      };
+    }),
+  );
+
+  // Cache for 2 hours
+  cache.set(cacheKey, detailedMovies, 7200);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        detailedMovies,
+        'Top rated movies fetched successfully',
+      ),
+    );
+});
