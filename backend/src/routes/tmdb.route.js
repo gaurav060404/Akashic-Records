@@ -3,7 +3,9 @@ import {
   carouselPosters,
   getTrending,
   topCreators,
+  topRatedAnimes,
   topRatedMovies,
+  topRatedSeries,
   trendingAnimes,
   trendingMovies,
   trendingSeries,
@@ -24,5 +26,7 @@ router.get('/trending/movies', trendingMovies);
 router.get('/trending/series', trendingSeries);
 router.get('/trending/animes', trendingAnimes);
 router.get('/movie/top-rated', topRatedMovies);
+router.get('/series/top-rated', topRatedSeries);
+router.get('/anime/top-rated', topRatedAnimes);
 
 export default router;

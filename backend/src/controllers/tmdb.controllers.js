@@ -467,3 +467,115 @@ export const topRatedMovies = asyncHandler(async (req, res) => {
       ),
     );
 });
+
+export const topRatedSeries = asyncHandler(async (req, res) => {
+  const cacheKey = 'top-rated-series';
+
+  // Check cache
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, cachedData, 'Top rated series fetched from cache'),
+      );
+  }
+
+  const result = await axiosInstance.get('/tv/top_rated');
+
+  const top10 = result.data.results.slice(0, 10);
+
+  const detailedSeries = await Promise.all(
+    top10.map(async (series) => {
+      const detailsRes = await axiosInstance.get(`/tv/${series.id}`, {
+        params: {
+          append_to_response: 'credits,videos',
+        },
+      });
+
+      const details = detailsRes.data;
+
+      return {
+        id: details.id,
+        title: details.name,
+        type: 'tv',
+        overview: details.overview,
+        poster: details.poster_path,
+        genres: details.genres?.map((g) => g.name) || [],
+        runtime: details.episode_run_time?.[0] || null,
+        language: details.spoken_languages?.[0]?.english_name,
+        rating: details.vote_average,
+        votes: details.vote_count,
+        releaseDate: details.first_air_date,
+        creators: details.created_by?.map((creator) => creator.name) || [],
+        popularity: details.popularity,
+      };
+    }),
+  );
+
+  // Cache for 2 hours
+  cache.set(cacheKey, detailedSeries, 7200);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        detailedSeries,
+        'Top rated series fetched successfully',
+      ),
+    );
+});
+
+export const topRatedAnimes = asyncHandler(async (req, res) => {
+  const cacheKey = 'top-rated-anime';
+
+  // Check cache
+  const cachedData = cache.get(cacheKey);
+
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, cachedData, 'Top rated anime fetched from cache'),
+      );
+  }
+
+  const result = await axios.get('https://api.jikan.moe/v4/top/anime');
+
+  const top10 = result.data.data.slice(0, 10);
+
+  const detailedAnime = top10.map((anime, index) => ({
+    rank: index + 1,
+    id: anime.mal_id,
+    title: anime.title,
+    type: 'anime',
+    overview: anime.synopsis,
+    poster: anime.images?.jpg?.large_image_url,
+    genres: anime.genres?.map((genre) => genre.name) || [],
+    episodes: anime.episodes,
+    language: 'Japanese',
+    rating: anime.score,
+    votes: anime.scored_by,
+    releaseDate: anime.aired?.from,
+    studios: anime.studios?.map((studio) => studio.name) || [],
+    popularity: anime.popularity,
+    status: anime.status,
+    year: anime.year,
+    season: anime.season,
+  }));
+
+  // Cache for 2 hours
+  cache.set(cacheKey, detailedAnime, 7200);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        detailedAnime,
+        'Top rated anime fetched successfully',
+      ),
+    );
+});
