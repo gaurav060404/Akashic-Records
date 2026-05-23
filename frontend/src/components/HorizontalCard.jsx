@@ -30,9 +30,10 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
   };
 
   const posterTitle = item.title || item.posterName || "Untitled";
+  const posterPath = item.posterPath || item.poster;
   const imgSrc = isAnime
-    ? item.posterPath
-    : `https://image.tmdb.org/t/p/w220_and_h330_face${item.posterPath}`;
+    ? posterPath
+    : `https://image.tmdb.org/t/p/w220_and_h330_face${posterPath}`;
 
   const handleOnClick = () => {
     const encodedPosterName = encodeURIComponent(posterTitle);
@@ -41,9 +42,9 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
       state: {
         poster: {
           id: item.id,
-          posterName: item.posterName,
-          posterPath: item.posterPath,
-          backDropPath: item.backDropPath,
+          posterName: item.posterName || item.title,
+          posterPath: posterPath,
+          backDropPath: item.backDropPath || item.backdrop,
           title: compName,
           overview: item.overview,
           director: Array.isArray(item.director) ? item.director[0]?.name : item.director,
@@ -54,7 +55,7 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
           releaseDate: item.releaseDate,
           popularity: item.popularity,
           trailer: item.trailerUrl,
-          credits:item.casts,
+          credits: item.casts,
           users: item.users,
           isUpcoming,
           isAnime,
@@ -129,11 +130,11 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
           {/* Info Grid */}
           <div className="grid grid-cols-2 gap-3 text-sm mb-2">
             {/* Language */}
-            {item.languages?.[0]?.english_name && (
+            {(item.language || item.languages?.[0]?.english_name) && (
               <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                 <span className="font-medium">Language:</span>
                 <span className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-md text-xs">
-                  {item.languages[0].english_name}
+                  {item.language || item.languages[0]?.english_name}
                 </span>
               </div>
             )}
@@ -141,7 +142,9 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
             {/* Release Date */}
             <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
               <FaCalendarAlt className="text-orange-500" />
-              <span className="text-xs">{item.releaseDate || "TBA"}</span>
+              <span className="text-xs">
+                {item.releaseDate ? item.releaseDate.substring(0, 10) : "TBA"}
+              </span>
             </div>
 
             {/* Runtime or Seasons */}
@@ -170,7 +173,7 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
           <FaStar className="text-white text-lg mb-2" />
           <div className="text-3xl font-bold mb-1">{formatRating(item.rating)}</div>
           <div className="text-xs opacity-90 text-center">
-            {item.users ? `${item.users} votes` : "No votes"}
+            {item.users || item.votes ? `${item.users || item.votes} votes` : "No votes"}
           </div>
         </div>
       </div>

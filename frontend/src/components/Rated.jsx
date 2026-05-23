@@ -9,7 +9,9 @@ export default function Rated({ rated ,title, isRated }) {
 
        useEffect(()=>{
         setPosters(rated);
-       },[rated]);
+       }, [rated]);
+    
+      console.log(rated);
 
        return (
         <div className='bg-black h-full pb-7 flex-col justify-center items-center'>
