@@ -1,15 +1,32 @@
 import Navbar from '../components/Navbar'
 import List from '../components/List';
 import { useRecoilValueLoadable } from 'recoil';
-import { movieSelector, topRatedMovies } from '../store/store';
 import SkeletonList from '../components/SkeletonList';
 import Rated from '../components/Rated';
 import SkeletonRated from '../components/SkeletonRated';
 import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { trendingMovies, topRatedMovies } from '../services/movieService.js';
 
 export default function Movies() {
-  const moviesLoadable = useRecoilValueLoadable(movieSelector);
-  const ratedMovies = useRecoilValueLoadable(topRatedMovies);
+
+  const {
+    data: trendingData,
+    isLoading: trendingLoading,
+    isError: trendingError
+  } = useQuery({
+    queryKey: ["trending-movies"],
+    queryFn: trendingMovies
+  });
+
+  const {
+    data: topRatedData,
+    isLoading: topRatedLoading,
+    isError: topRatedError
+  } = useQuery({
+    queryKey: ["top-rated-movies"],
+    queryFn: topRatedMovies
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -20,16 +37,16 @@ export default function Movies() {
       <div className='w-full h-20'>
         <Navbar isHomePage={false} hasBg={false} />
       </div>
-      {moviesLoadable.state === 'loading' && <SkeletonList title="Movies" />}
-      {moviesLoadable.state === 'hasValue' && (
-        <List title="Movies" poster={moviesLoadable.contents} />
+      {trendingLoading && <SkeletonList title="Movies" />}
+      {trendingData && (
+        <List title="Movies" poster={trendingData} />
       )}
-      {moviesLoadable.state === 'hasError' && (
+      {trendingError && (
         <div className='text-white'>Error loading data</div>
       )}
-      {ratedMovies.state == 'loading' && <SkeletonRated title={"Movies"} isRated={true} />}
-      {ratedMovies.state == 'hasValue' && <Rated title="Movies" isRated={true} rated={ratedMovies.contents} />}
-      {ratedMovies.state === 'hasError' && (
+      {topRatedLoading && <SkeletonRated title={"Movies"} isRated={true} />}
+      {topRatedData && <Rated title="Movies" isRated={true} rated={topRatedData} />}
+      {topRatedError && (
         <div className='text-white'>Error loading data</div>
       )}
     </div>
