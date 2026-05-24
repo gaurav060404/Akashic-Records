@@ -1,21 +1,78 @@
 import Carousel from '../components/Carousel'
 import List from '../components/List'
-import { useRecoilValueLoadable } from 'recoil';
-import { allStateSelector, carouselPosters, upcomingAnimes, upcomingMovies, upcomingSeries } from '../store/store';
 import Companies from '../components/Companies';
-import Footer from '../components/Footer'; 
+import Footer from '../components/Footer';
 import TopDirectors from '../components/TopDirectors';
+import { carouselPosters, trending } from '../services/homePageSeries.js';
+import { upcomingAnimes } from '../services/animeService.js';
+import { upcomingMovies } from '../services/movieService.js';
+import { upcomingSeries } from '../services/seriesService.js';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Home() {
-  const trending = useRecoilValueLoadable(allStateSelector);
-  const images = useRecoilValueLoadable(carouselPosters);
-  const upcomingMovie = useRecoilValueLoadable(upcomingMovies);
-  const upcomingShows = useRecoilValueLoadable(upcomingSeries);
-  const upcomingAnime = useRecoilValueLoadable(upcomingAnimes);
 
-  const loadables = [trending,images,upcomingMovie,upcomingShows,upcomingAnime];
+  const {
+    data: carouselData,
+    isLoading: carouselLoading,
+    isError: carouselError
+  } = useQuery({
+    queryKey: ["carousel-poster"],
+    queryFn: carouselPosters
+  });
 
-  if (loadables.some(l=> l.state === 'loading')) {
+  const {
+    data: upcomingAnimeData,
+    isLoading: upcomingAnimeLoading,
+    isError: upcomingAnimeError
+  } = useQuery({
+    queryKey: ["upcoming-animes"],
+    queryFn: upcomingAnimes
+  });
+
+  const {
+    data: upcomingMoviesData,
+    isLoading: upcomingMoviesLoading,
+    isError: upcomingMoviesError
+  } = useQuery({
+    queryKey: ["upcoming-movies"],
+    queryFn: upcomingMovies
+  });
+
+  const {
+    data: upcomingSeriesData,
+    isLoading: upcomingSeriesLoading,
+    isError: upcomingSeriesError
+  } = useQuery({
+    queryKey: ["upcoming-series"],
+    queryFn: upcomingSeries
+  });
+
+  const {
+    data: trendingData,
+    isLoading: trendingLoading,
+    isError: trendingError
+  } = useQuery({
+    queryKey: ["trending"],
+    queryFn: trending
+  });
+
+  const loadingStates = [
+    carouselLoading,
+    upcomingMoviesLoading,
+    upcomingSeriesLoading,
+    upcomingAnimeLoading,
+    trendingLoading
+  ];
+
+  const errorStates = [
+    carouselError,
+    upcomingMoviesError,
+    upcomingSeriesError,
+    upcomingAnimeError,
+    trendingError
+  ];
+
+  if (loadingStates.some(Boolean)) {
     return <div className='h-screen flex justify-center items-center bg-black'>
       <button disabled type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center">
         <svg aria-hidden="true" role="status" className="inline w-4 h-4 me-3 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -27,36 +84,34 @@ export default function Home() {
     </div>
   }
 
-  if(loadables.some(l => l.state === 'hasError')){
-    return(
+  if (errorStates.some(Boolean)) {
+    return (
       <div className='h-screen flex items-start justify-center bg-black text-white'>
         Oops!! Something Went Wrong
       </div>
     )
   }
 
-  if (loadables.every(l=>l.state === 'hasValue')) {
-    return (
-      <div className='flex flex-col min-h-screen'>
-        <div className='flex-grow'>
-          <Carousel images={images.contents}/>
-          <div className='text-white bg-black flex items-center justify-center'>
-            <p className='py-6 px-3 font-custom4'>The all in one website for Pop Culture.</p>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
-            </svg>
-          </div>
-          <List key="trending" title="" poster={trending.contents} isUpcoming={false}/>
-          <Companies />
-          <List key="upcomingMoviesList" title="Movies" poster={upcomingMovie.contents} isUpcoming={true}/>
-          <TopDirectors />
-          <List key="upcomingSeriesList" title="Series" poster={upcomingShows.contents} isUpcoming={true}/>
-          <List key="upcomingAnimesList" title="Animes" poster={upcomingAnime.contents} isUpcoming={true} isAnime={true}/>
+  return (
+    <div className='flex flex-col min-h-screen'>
+      <div className='flex-grow'>
+        <Carousel images={carouselData} />
+        <div className='text-white bg-black flex items-center justify-center'>
+          <p className='py-6 px-3 font-custom4'>The all in one website for Pop Culture.</p>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
+          </svg>
         </div>
-        
-        <Footer />
+        <List key="trending" title="" poster={trendingData} isUpcoming={false} />
+        <Companies />
+        <List key="upcomingMoviesList" title="Movies" poster={upcomingMoviesData} isUpcoming={true} />
+        <TopDirectors />
+        <List key="upcomingSeriesList" title="Series" poster={upcomingSeriesData} isUpcoming={true} />
+        <List key="upcomingAnimesList" title="Animes" poster={upcomingAnimeData} isUpcoming={true} isAnime={true} />
       </div>
-    )
-  }
+
+      <Footer />
+    </div>
+  )
   return null;
 }

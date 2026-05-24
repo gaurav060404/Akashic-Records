@@ -56,7 +56,7 @@ export default function Carousel({ images }) {
         <div className="absolute inset-0">
           {/* Current Image */}
           <img
-            src={`https://image.tmdb.org/t/p/original/${currentImage.backDropPath}`}
+            src={`https://image.tmdb.org/t/p/original/${currentImage.backdrop}`}
             alt={`Carousel ${slide}`}
             className={`absolute inset-0 h-full w-full object-cover transition-all duration-1000 ease-in-out transform ${isTransitioning
               ? 'opacity-0 scale-105'
@@ -67,7 +67,7 @@ export default function Carousel({ images }) {
           {/* Next Image (for smooth transition) */}
           {nextImage && (
             <img
-              src={`https://image.tmdb.org/t/p/original/${nextImage.backDropPath}`}
+              src={`https://image.tmdb.org/t/p/original/${nextImage.backdrop}`}
               alt={`Carousel ${slide + 1}`}
               className={`absolute inset-0 h-full w-full object-cover transition-all duration-1000 ease-in-out transform ${isTransitioning
                 ? 'opacity-100 scale-100'
@@ -128,7 +128,7 @@ export default function Carousel({ images }) {
           : 'transform translate-y-0 opacity-100'
           }`}>
           <p className="text-white text-sm font-custom4 drop-shadow-lg opacity-45">
-            {currentMovieName.title}
+            {images.title}
           </p>
         </div>
       </div>
