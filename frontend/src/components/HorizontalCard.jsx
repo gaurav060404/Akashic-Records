@@ -64,6 +64,9 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
     });
   };
 
+  console.log(item);
+  console.log(isAnime);
+
   return (
     <div
       className="group relative bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 
@@ -150,17 +153,39 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
             {/* Runtime or Seasons */}
             <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
               <FaClock className="text-orange-500" />
-              <span className="text-xs">
+              {!isAnime && <span className="text-xs">
                 {compName === "Movies"
                   ? formatRuntime(item.runtime)
                   : `${item.seasons || 1} ${item.seasons > 1 ? "Seasons" : "Season"}`}
-              </span>
+              </span>}
+              {isAnime && (
+                <span className="text-xs">
+                  {item.animeType === "Movie"
+                    ? "Movie"
+                    : item.episodes
+                      ? `${item.episodes} ${item.episodes > 1 ? "Episodes" : "Episode"
+                      }`
+                      : "Currently Airing"}
+                </span>
+              )}
             </div>
 
             {/* Popularity */}
             <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <FaUsers className="text-orange-500" />
-              <span className="text-xs">{formatPopularity(item.popularity)}k</span>
+              {
+                isAnime ?
+                  <>
+                    <FaFilm className="text-orange-500" />
+                    <span className="text-xs">
+                      {item.studios[0]}
+                    </span>
+                  </> :
+                  <>
+                    <FaUsers className="text-orange-500" />
+                    <span className="text-xs">
+                      {formatPopularity(item.popularity)}k
+                    </span>
+                  </>}
             </div>
           </div>
         </div>
