@@ -551,6 +551,7 @@ export const topRatedAnimes = asyncHandler(async (req, res) => {
     id: anime.mal_id,
     title: anime.title,
     type: 'anime',
+    animeType: anime.type,
     overview: anime.synopsis,
     poster: anime.images?.jpg?.large_image_url,
     genres: anime.genres?.map((genre) => genre.name) || [],
