@@ -128,7 +128,7 @@ export default function Carousel({ images }) {
           : 'transform translate-y-0 opacity-100'
           }`}>
           <p className="text-white text-sm font-custom4 drop-shadow-lg opacity-45">
-            {images.title}
+            {currentImage.title}
           </p>
         </div>
       </div>
