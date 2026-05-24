@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { FaStar, FaCalendarAlt, FaClock, FaUsers, FaTv, FaFilm } from 'react-icons/fa';
+import { FaClapperboard } from 'react-icons/fa6';
 
 export default function HorizontalCard({ id, rank, compName, item, isAnime, isUpcoming }) {
   const navigate = useNavigate();
@@ -119,13 +120,13 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
 
           {/* Genres */}
           <div className="mb-4 flex flex-wrap gap-2">
-            {(isAnime ? item.genres?.slice(0, 3) : item.genres?.slice(0, 2))?.map((genre, idx) => (
+            {item.genres?.slice(0, isAnime ? 3 : 2).map((genre, idx) => (
               <span
                 key={idx}
                 className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs 
-                           px-3 py-1 rounded-full font-medium shadow-sm"
+                 px-3 py-1 rounded-full font-medium shadow-sm"
               >
-                {(isAnime ? genre : genre?.name)?.split("&")[0].trim()}
+                {genre.split("&")[0].trim()}
               </span>
             ))}
           </div>
@@ -152,11 +153,13 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
 
             {/* Runtime or Seasons */}
             <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <FaClock className="text-orange-500" />
+              {!isAnime && compName == "Series" ?
+                item.creators.length === 0 ? "" : <FaClapperboard className='text-orange-500' />
+                : <FaClock className="text-orange-500" />}
               {!isAnime && <span className="text-xs">
                 {compName === "Movies"
                   ? formatRuntime(item.runtime)
-                  : `${item.seasons || 1} ${item.seasons > 1 ? "Seasons" : "Season"}`}
+                  : item.creators.map((creator, idx) => <span key={idx}>{creator} {idx !== item.creators.length - 1 && ", "}</span>)}
               </span>}
               {isAnime && (
                 <span className="text-xs">

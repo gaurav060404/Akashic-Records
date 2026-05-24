@@ -4,14 +4,8 @@ import HorizontalCard from './HorizontalCard';
 import { useSetRecoilState } from 'recoil';
 import { ratedPosterState } from '../store/store';
 
-export default function Rated({ rated ,title, isRated }) {
-       const setPosters = useSetRecoilState(ratedPosterState);
-
-       useEffect(()=>{
-        setPosters(rated);
-       }, [rated]);
-
-       return (
+export default function Rated({ rated, title, isRated }) {
+    return (
         <div className='bg-black h-full pb-7 flex-col justify-center items-center'>
             <div className='w-full text-white flex justify-between items-center px-24 pt-4'>
                 <Link className='font-custom3 text-2xl hover:text-blue-300' to={`/${title.toLowerCase()}`}>{isRated ? "Top Rated" : "Trending"} {title}</Link>
@@ -26,8 +20,8 @@ export default function Rated({ rated ,title, isRated }) {
             </div>
             <div className='bg-black w-full flex flex-col justify-center items-center gap-4 pt-4 pb-5'>
                 {
-                    rated.map((data,index)=>
-                        <HorizontalCard key={data.id} rank={index+1} isUpcoming={false} isAnime={title == "Anime" ? true : false} id={data.id} compName={title} item={data}/>
+                    rated.map((data, index) =>
+                        <HorizontalCard key={data.id} rank={index + 1} isUpcoming={false} isAnime={title == "Anime" ? true : false} id={data.id} compName={title} item={data} />
                     )
                 }
             </div>

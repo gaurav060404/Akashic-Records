@@ -1,15 +1,31 @@
 import React, { useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import List from '../components/List';
-import { useRecoilValue, useRecoilValueLoadable } from 'recoil';
-import { seriesSelector, topRatedSeries } from '../store/store';
 import SkeletonList from '../components/SkeletonList';
 import Rated from '../components/Rated';
 import SkeletonRated from '../components/SkeletonRated';
+import { useQuery } from '@tanstack/react-query';
+import { topRatedSeries, trendingSeries } from '../services/seriesService.js';
 
 export default function Series() {
-  const seriesLoadable = useRecoilValueLoadable(seriesSelector);
-  const ratedSeries = useRecoilValueLoadable(topRatedSeries);
+
+  const {
+    data: trendingData,
+    isLoading: trendingLoading,
+    error: trendingError
+  } = useQuery({
+    queryKey: ["trending-series"],
+    queryFn: trendingSeries
+  });
+
+  const {
+    data: topRatedData,
+    isLoading: topRatedLoading,
+    error: topRatedError
+  } = useQuery({
+    queryKey: ["top-rated-series"],
+    queryFn: topRatedSeries
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -18,23 +34,22 @@ export default function Series() {
   return (
     <div className='w-full h-full absolute bg-black'>
       <div className='w-full h-20'>
-        <Navbar isHomePage={false} hasBg={false}/>
+        <Navbar isHomePage={false} hasBg={false} />
       </div>
-      {seriesLoadable.state === 'loading' && <SkeletonList title="Series"/>}
-      {seriesLoadable.state === 'hasValue' && (
-        <List title="Series" poster={seriesLoadable.contents} isRated={false}/>
+      {trendingLoading && <SkeletonList title="Series" />}
+      {trendingData && (
+        <List title="Series" poster={trendingData} isRated={false} />
       )}
-      {seriesLoadable.state === 'hasError' && (
+      {trendingError && (
         <div className='text-white'>Error loading data</div>
       )}
-      {ratedSeries.state === 'loading' && <SkeletonRated title={"Series"} isRated={true}/>}
-      {ratedSeries.state === 'hasValue' && (
-        <Rated title="Series" isRated={true} rated={ratedSeries.contents}/>
+      {topRatedLoading && <SkeletonRated title={"Series"} isRated={true} />}
+      {topRatedData && (
+        <Rated title="Series" isRated={true} rated={topRatedData} />
       )}
-      {ratedSeries.state === 'hasError' && (
+      {topRatedError && (
         <div className='text-white'>Error loading data</div>
       )}
     </div>
   )
-
 }

@@ -10,7 +10,7 @@ export const trendingSeries = async () => {
   return response.data.data;
 };
 
-export const topRatedMovies = async () => {
+export const topRatedSeries = async () => {
   const response = await axiosInstance.get("/series/top-rated");
   return response.data.data;
 };
