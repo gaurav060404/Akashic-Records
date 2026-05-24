@@ -12,7 +12,7 @@ export default function Series() {
   const {
     data: trendingData,
     isLoading: trendingLoading,
-    error: trendingError
+    isError: trendingError
   } = useQuery({
     queryKey: ["trending-series"],
     queryFn: trendingSeries
