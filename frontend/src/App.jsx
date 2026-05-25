@@ -4,6 +4,7 @@ import Signup from './pages/Signup'
 import Movies from './pages/Movies'
 import Series from './pages/Series'
 import Anime from './pages/Anime'
+import Manga from './pages/Manga'
 import { RecoilRoot } from 'recoil'
 import NotFound from './pages/NotFound'
 import Details from './pages/Details'
@@ -90,6 +91,7 @@ export default function App() {
               <Route path='/anime' element={<Anime />} ></Route>
               <Route path='/movies' element={<Movies />} ></Route>
               <Route path='/series' element={<Series />} ></Route>
+              <Route path='/manga' element={<Manga />} ></Route>
               <Route path='/:title/:id' element={<Details />} ></Route>
               <Route path='/:category/rated/:id/:posterName' element={<Details />} ></Route>
               <Route path='/google/callback' element={<GoogleCallback />} />
