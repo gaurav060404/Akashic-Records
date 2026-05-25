@@ -117,6 +117,9 @@ export default function Navbar({ isHomePage, hasBg }) {
               <NavLink to="/anime" isActive={isActive("/anime")}>
                 Anime
               </NavLink>
+              <NavLink to="/manga" isActive={isActive("/manga")}>
+                Manga
+              </NavLink>
             </ul>
           </nav>
 
