@@ -39,8 +39,6 @@ const TopDirectors = () => {
     return null;
   }
 
-  console.log(topCreatorsData);
-
   return (
     <div className='bg-black h-auto pb-7 flex-row'>
       {/* Header section - matches List component */}
