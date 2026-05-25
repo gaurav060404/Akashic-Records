@@ -68,6 +68,11 @@ export default function Home() {
 
   const loadingStates = [
     carouselLoading,
+    upcomingMoviesLoading,
+    upcomingSeriesLoading,
+    upcomingAnimeLoading,
+    recommendedLoading,
+    trendingLoading
   ];
 
   const errorStates = [
