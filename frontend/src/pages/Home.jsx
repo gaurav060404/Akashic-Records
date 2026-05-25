@@ -8,6 +8,7 @@ import { upcomingAnimes } from '../services/animeService.js';
 import { upcomingMovies } from '../services/movieService.js';
 import { upcomingSeries } from '../services/seriesService.js';
 import { useQuery } from '@tanstack/react-query';
+import { recommendedMangas } from '../services/mangaService.js';
 
 export default function Home() {
 
@@ -56,12 +57,17 @@ export default function Home() {
     queryFn: trending
   });
 
+  const {
+    data: recommendedData,
+    isLoading: recommendedLoading,
+    isError: recommendedError
+  } = useQuery({
+    queryKey: ["recommended-mangas"],
+    queryFn: recommendedMangas
+  });
+
   const loadingStates = [
     carouselLoading,
-    upcomingMoviesLoading,
-    upcomingSeriesLoading,
-    upcomingAnimeLoading,
-    trendingLoading
   ];
 
   const errorStates = [
@@ -108,6 +114,7 @@ export default function Home() {
         <TopDirectors />
         <List key="upcomingSeriesList" title="Series" poster={upcomingSeriesData} isUpcoming={true} />
         <List key="upcomingAnimesList" title="Animes" poster={upcomingAnimeData} isUpcoming={true} isAnime={true} />
+        <List key="recommendedMangasList" title="Manga" poster={recommendedData} isUpcoming={false} isReccManga={true} />
       </div>
 
       <Footer />

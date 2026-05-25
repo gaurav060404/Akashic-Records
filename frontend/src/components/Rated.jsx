@@ -21,7 +21,7 @@ export default function Rated({ rated, title, isRated }) {
             <div className='bg-black w-full flex flex-col justify-center items-center gap-4 pt-4 pb-5'>
                 {
                     rated.map((data, index) =>
-                        <HorizontalCard key={data.id} rank={index + 1} isUpcoming={false} isAnime={title == "Anime" ? true : false} id={data.id} compName={title} item={data} />
+                        <HorizontalCard key={data.id} rank={index + 1} isUpcoming={false} isAnime={title == "Anime" ? true : false} id={data.id} compName={title} item={data} isManga={ title === "Manga" ? true : false} />
                     )
                 }
             </div>

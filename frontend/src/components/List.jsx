@@ -9,7 +9,7 @@ function shuffleArray(array) {
   return array;
 }
 
-export default function List({ title = '', poster = [], isUpcoming, isAnime }) {
+export default function List({ title = '', poster = [], isUpcoming, isAnime, isReccManga }) {
   const initial = useMemo(
     () => shuffleArray([...poster]).slice(0, 5),
     [poster]
@@ -26,7 +26,7 @@ export default function List({ title = '', poster = [], isUpcoming, isAnime }) {
     <div className='bg-black h-auto pb-7 flex-row'>
       <div className='w-full text-white flex justify-between items-center px-24 pt-4'>
         <h2 className='font-custom3 text-2xl'>
-          {isUpcoming ? 'Upcoming' : 'Trending'} {title}
+          {isUpcoming ? 'Upcoming' : isReccManga ? "Recommended" : 'Trending'} {title}
         </h2>
       </div>
       <div className='bg-black h-80 flex justify-evenly'>
@@ -37,6 +37,7 @@ export default function List({ title = '', poster = [], isUpcoming, isAnime }) {
             title={title.toLowerCase()}
             isUpcoming={isUpcoming}
             isAnime={isAnime}
+            isManga={title === "Manga" ? true : false}
           />
         ))}
       </div>

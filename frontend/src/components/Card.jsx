@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-export default function Card({ item, title, isUpcoming, isAnime }) {
+export default function Card({ item, title, isUpcoming, isAnime, isManga }) {
   const navigate = useNavigate();
 
   function handleOnClick() {
@@ -8,24 +8,24 @@ export default function Card({ item, title, isUpcoming, isAnime }) {
     navigate(`/details/${item.id}`, {
       state: {
         poster: {
-          id:item.id,
-          posterName:item.posterName,
-          posterPath:item.posterPath,
-          backDropPath:item.backDropPath,
-          overview:item.overview,
-          runtime:item.runtime,
-          director:item.director[0]?.name || item.director,
-          genres:item.genres,
-          rating:item.rating,
-          seasons:item.seasons,
-          releaseDate:item.releaseDate,
-          popularity:item.popularity,
-          users:item.users,
-          trailer:item.trailerUrl,
-          type:item.type,
+          id: item.id,
+          posterName: item.posterName,
+          posterPath: item.posterPath,
+          backDropPath: item.backDropPath,
+          overview: item.overview,
+          runtime: item.runtime,
+          director: item.director[0]?.name || item.director,
+          genres: item.genres,
+          rating: item.rating,
+          seasons: item.seasons,
+          releaseDate: item.releaseDate,
+          popularity: item.popularity,
+          users: item.users,
+          trailer: item.trailerUrl,
+          type: item.type,
           isUpcoming,
           isAnime,
-          credits:item.casts,
+          credits: item.casts,
           title,
         },
       },
@@ -37,7 +37,7 @@ export default function Card({ item, title, isUpcoming, isAnime }) {
       <div className='w-full h-full flex-row justify-center items-center group'>
         <div className='bg-white h-5/6 rounded-sm overflow-hitem.idden' onClick={handleOnClick}>
           <img
-            src={isAnime ? item.poster : `https://image.tmdb.org/t/p/w220_and_h330_face${item.poster}`}
+            src={isAnime || isManga ? item.poster : `https://image.tmdb.org/t/p/w220_and_h330_face${item.poster}`}
             alt={item.poster}
             className='object-cover w-full h-full hover:border cursor-pointer'
           />

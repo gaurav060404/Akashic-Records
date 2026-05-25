@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { FaStar, FaCalendarAlt, FaClock, FaUsers, FaTv, FaFilm } from 'react-icons/fa';
+import { FaStar, FaCalendarAlt, FaClock, FaUsers, FaTv, FaFilm, FaBook, FaBookOpen } from 'react-icons/fa';
 import { FaClapperboard } from 'react-icons/fa6';
 
-export default function HorizontalCard({ id, rank, compName, item, isAnime, isUpcoming }) {
+export default function HorizontalCard({ id, rank, compName, item, isAnime, isUpcoming, isManga = false }) {
   const navigate = useNavigate();
 
   const formatPopularity = (popularity) => {
@@ -32,7 +32,7 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
 
   const posterTitle = item.title || item.posterName || "Untitled";
   const posterPath = item.posterPath || item.poster;
-  const imgSrc = isAnime
+  const imgSrc = isAnime || isManga
     ? posterPath
     : `https://image.tmdb.org/t/p/w220_and_h330_face${posterPath}`;
 
@@ -64,9 +64,6 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
       },
     });
   };
-
-  console.log(item);
-  console.log(isAnime);
 
   return (
     <div
@@ -152,7 +149,7 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
             </div>
 
             {/* Runtime or Seasons */}
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+            {!isManga && <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
               {!isAnime && compName == "Series" ?
                 item.creators.length === 0 ? "" : <FaClapperboard className='text-orange-500' />
                 : <FaClock className="text-orange-500" />}
@@ -171,7 +168,27 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
                       : "Currently Airing"}
                 </span>
               )}
-            </div>
+            </div>}
+
+            {/* Serialization */}
+            {isManga && item.volumes && <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <span>
+                <FaBookOpen className='text-orange-500' />
+              </span>
+              <span className="text-xs">
+                {item.volumes} Volumes
+              </span>
+            </div>}
+
+            {/* Status */}
+            {isManga && <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <span>
+                <FaBook className='text-orange-500' />
+              </span>
+              <span className="text-xs">
+                {item.status} 
+              </span>
+            </div>}
 
             {/* Popularity */}
             <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
