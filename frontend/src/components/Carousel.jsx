@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
-import { useRecoilState } from "recoil";
 import { Link } from "react-router-dom";
 
 export default function Carousel({ images }) {
-  const [slide, setSlide] = useRecoilState(slideIndex);
+  const [slide, setSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -101,8 +100,8 @@ export default function Carousel({ images }) {
         {!isLoggedIn && (
           <div
             className={`flex gap-4 flex-wrap transition-all duration-700 ease-out delay-200 ${isTransitioning
-                ? "translate-y-2 opacity-80"
-                : "translate-y-0 opacity-100"
+              ? "translate-y-2 opacity-80"
+              : "translate-y-0 opacity-100"
               }`}
           >
             <Link to={'/login'}>

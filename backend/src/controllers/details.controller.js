@@ -48,7 +48,7 @@ export const getDetails = asyncHandler(async (req, res) => {
       seasons:
         type === 'tv' || type === 'series' ? item.number_of_seasons : null,
       popularity: item.popularity,
-      director: director?.name || item.created_by[0].name || 'Unknown',
+      director: director?.name || item?.created_by[0]?.name || 'Unknown',
       trailer: trailer
         ? `https://www.youtube.com/watch?v=${trailer.key}`
         : null,

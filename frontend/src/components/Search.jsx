@@ -1,19 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useRecoilValueLoadable } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 
 export default function Search({ isOpen, onClose }) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const searchLoadable = useRecoilValueLoadable(searchResults(debouncedQuery));
   const navigate = useNavigate();
-
-  // debounce query
-  useEffect(() => {
-    const timeout = setTimeout(() => setDebouncedQuery(query), 400);
-    return () => clearTimeout(timeout);
-  }, [query]);
 
   const handleItemClick = (item) => {
     let type = item.type ? item.type.toLowerCase() : "movie";
