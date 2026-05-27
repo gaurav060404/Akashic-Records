@@ -5,6 +5,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { googleConfig } from './src/config/oauthConfig.js';
 import authRoutes from './src/authRoutes.js';
 import tmdbRoutes from './src/routes/tmdb.route.js';
+import detailRoutes from './src/routes/details.route.js';
 import User from './src/models/userModel.js';
 import ApiResponse from './src/utils/ApiResponse.js';
 
@@ -65,6 +66,7 @@ passport.use(
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tmdb', tmdbRoutes);
+app.use('/api/details', detailRoutes);
 app.get('/', (req, res) => {
   return res.json(new ApiResponse(200, {}, 'Backend is running'));
 });

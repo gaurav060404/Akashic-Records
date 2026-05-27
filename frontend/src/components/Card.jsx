@@ -3,33 +3,25 @@ import { useNavigate } from 'react-router-dom';
 export default function Card({ item, title, isUpcoming, isAnime, isManga }) {
   const navigate = useNavigate();
 
+  console.log(title);
+
+  function whatType(title) {
+    if (item?.type) return item.type.toLowerCase();
+    if (isAnime) return "anime";
+    if (isManga) return "manga";
+
+    const lowerTitle = title?.toLowerCase() || "";
+    if (lowerTitle.includes("series") || lowerTitle === "tv") return "series";
+    if (lowerTitle.includes("movie")) return "movie";
+    if (lowerTitle.includes("manga")) return "manga";
+    if (lowerTitle.includes("anime")) return "anime";
+
+    return "movie"; // fallback
+  }
+
   function handleOnClick() {
-    // Pass the card data using the `state` property
-    navigate(`/details/${item.id}`, {
-      state: {
-        poster: {
-          id: item.id,
-          posterName: item.posterName,
-          posterPath: item.posterPath,
-          backDropPath: item.backDropPath,
-          overview: item.overview,
-          runtime: item.runtime,
-          director: item.director[0]?.name || item.director,
-          genres: item.genres,
-          rating: item.rating,
-          seasons: item.seasons,
-          releaseDate: item.releaseDate,
-          popularity: item.popularity,
-          users: item.users,
-          trailer: item.trailerUrl,
-          type: item.type,
-          isUpcoming,
-          isAnime,
-          credits: item.casts,
-          title,
-        },
-      },
-    });
+    // Navigate using ID and type
+    navigate(`/details/${whatType(title)}/${item.id}`);
   }
 
   return (

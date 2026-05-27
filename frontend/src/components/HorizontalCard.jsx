@@ -37,32 +37,11 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
     : `https://image.tmdb.org/t/p/w220_and_h330_face${posterPath}`;
 
   const handleOnClick = () => {
-    const encodedPosterName = encodeURIComponent(posterTitle);
+    let type = compName ? compName.toLowerCase() : (item.type ? item.type.toLowerCase() : "movie");
+    if (type === "movies") type = "movie";
+    if (type === "series") type = "series";
 
-    navigate(`/${compName.toLowerCase()}/rated/${id}/${encodedPosterName}`, {
-      state: {
-        poster: {
-          id: item.id,
-          posterName: item.posterName || item.title,
-          posterPath: posterPath,
-          backDropPath: item.backDropPath || item.backdrop,
-          title: compName,
-          overview: item.overview,
-          director: Array.isArray(item.director) ? item.director[0]?.name : item.director,
-          genres: item.genres,
-          rating: item.rating,
-          seasons: item.seasons,
-          runtime: item.runtime,
-          releaseDate: item.releaseDate,
-          popularity: item.popularity,
-          trailer: item.trailerUrl,
-          credits: item.casts,
-          users: item.users,
-          isUpcoming,
-          isAnime,
-        },
-      },
-    });
+    navigate(`/details/${type}/${id}`);
   };
 
   return (
@@ -186,7 +165,7 @@ export default function HorizontalCard({ id, rank, compName, item, isAnime, isUp
                 <FaBook className='text-orange-500' />
               </span>
               <span className="text-xs">
-                {item.status} 
+                {item.status}
               </span>
             </div>}
 

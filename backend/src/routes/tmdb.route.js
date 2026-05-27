@@ -15,7 +15,7 @@ import {
   upcomingAnimes,
   upcomingMovies,
   upcomingSeries,
-} from '../controllers/tmdb.controllers.js';
+} from '../controllers/tmdb.controller.js';
 
 const router = Router();
 

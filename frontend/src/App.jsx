@@ -92,8 +92,7 @@ export default function App() {
               <Route path='/movies' element={<Movies />} ></Route>
               <Route path='/series' element={<Series />} ></Route>
               <Route path='/manga' element={<Manga />} ></Route>
-              <Route path='/:title/:id' element={<Details />} ></Route>
-              <Route path='/:category/rated/:id/:posterName' element={<Details />} ></Route>
+              <Route path='/details/:type/:id' element={<Details />} ></Route>
               <Route path='/google/callback' element={<GoogleCallback />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/about" element={<About />} />

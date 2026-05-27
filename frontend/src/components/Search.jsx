@@ -17,29 +17,11 @@ export default function Search({ isOpen, onClose }) {
   }, [query]);
 
   const handleItemClick = (item) => {
-    const posterData = {
-      id: item.id,
-      title: item.title,
-      posterPath: item.poster,
-      backDropPath: item.backdrop || item.poster,
-      overview: item.overview || "No overview available.",
-      rating: item.rating || 0,
-      popularity: item.popularity || null,
-      releaseDate: item.releaseDate,
-      type: item.type,
-      isAnime: item.type === "Anime",
-      genres: item.genres || [],
-      languages: item.languages || [],
-      director: item.director || "Unknown",
-      credits: item.casts || [],
-      trailer: item.trailerUrl || null,
-      seasons: item.seasons ?? 0,
-      episodes: item.episodes ?? 0,
-      runtime: item.runtime,
-      users: item.users
-    };
+    let type = item.type ? item.type.toLowerCase() : "movie";
+    if (type === "movies") type = "movie";
+    if (type === "series" || type === "tv") type = "series";
 
-    navigate(`/details/${item.id}`, { state: { poster: posterData } });
+    navigate(`/details/${type}/${item.id}`);
     onClose();
   };
 
