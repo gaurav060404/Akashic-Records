@@ -15,7 +15,7 @@ export const getDetails = asyncHandler(async (req, res) => {
 
   let data;
 
-  if (type === 'movie' || (type === 'tv' || type === "series")) {
+  if (type === 'movie' || type === 'tv' || type === 'series') {
     const endpoint = type === 'movie' ? `/movie/${id}` : `/tv/${id}`;
 
     const result = await axiosInstance.get(endpoint, {
@@ -45,18 +45,22 @@ export const getDetails = asyncHandler(async (req, res) => {
       genres: item.genres || [],
       releaseDate: item.release_date || item.first_air_date,
       runtime: item.runtime || item.episode_run_time?.[0] || null,
-      seasons: type === 'tv' ? item.number_of_seasons : null,
+      seasons:
+        type === 'tv' || type === 'series' ? item.number_of_seasons : null,
       popularity: item.popularity,
-      director: director?.name || 'Unknown',
+      director: director?.name || item.created_by[0].name || 'Unknown',
       trailer: trailer
         ? `https://www.youtube.com/watch?v=${trailer.key}`
         : null,
       credits:
-        item.credits?.cast?.slice(0, 12).map((cast) => ({
-          name: cast.name,
-          character: cast.character,
-          image: cast.profile_path,
-        })) || [],
+        item.credits?.cast
+          ?.slice(0, 12)
+          .filter((cast) => cast.profile_path != null)
+          .map((cast) => ({
+            name: cast.name,
+            character: cast.character,
+            image: cast.profile_path,
+          })) || [],
       type,
     };
   } else if (type === 'anime') {
@@ -98,6 +102,36 @@ export const getDetails = asyncHandler(async (req, res) => {
           image: char.character?.images?.jpg?.image_url || null,
         })) || [],
       type,
+      animeType: anime.type,
+    };
+  } else if (type === 'manga') {
+    const result = await axios.get(`https://api.jikan.moe/v4/manga/${id}/full`);
+
+    const manga = result.data.data;
+
+    data = {
+      id: manga.mal_id,
+      title: manga.title,
+      overview: manga.synopsis,
+      poster:
+        manga.images?.jpg?.large_image_url ||
+        manga.images?.jpg?.image_url ||
+        null,
+      backdrop: null,
+      rating: manga.score,
+      genres: manga.genres || [],
+      releaseDate: manga.published?.from,
+      runtime: null,
+      chapters: manga.chapters,
+      volumes: manga.volumes,
+      status: manga.status,
+      popularity: manga.members,
+      director: manga.authors?.[0]?.name || 'Unknown',
+      serializations: manga.serializations?.map((s) => s.name) || [],
+      trailer: null,
+      credits: [],
+      type: 'manga',
+      mangaType: manga.type
     };
   } else {
     throw new ApiError(400, 'Invalid type');

@@ -8,11 +8,7 @@ import { toast } from "react-hot-toast";
 
 export default function Details() {
   const navigate = useNavigate();
-
   const { type, id } = useParams();
-
-  console.log(type, id);
-
   const [showFullOverview, setShowFullOverview] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
@@ -125,7 +121,7 @@ export default function Details() {
         {/* Backdrop */}
         <div className="h-[60vh] sm:h-[70vh] lg:h-[80vh] w-full overflow-hidden">
           <img
-            src={`https://image.tmdb.org/t/p/original${item.backdrop}`}
+            src={(item.type === "anime" || item.type === "manga") ? item.poster : `https://image.tmdb.org/t/p/original${item.backdrop}`}
             alt={item.title}
             className="object-cover w-full h-full transition-transform duration-700 hover:scale-105"
           />
@@ -145,14 +141,14 @@ export default function Details() {
                 <div className="flex-shrink-0 w-48 sm:w-56 lg:w-72">
                   <div className="aspect-[2/3] overflow-hidden rounded-xl shadow-2xl border-2 border-white/20">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${item.poster}`}
+                      src={(item.type === "anime" || item.type === "manga") ? item.poster : `https://image.tmdb.org/t/p/w500${item.poster}`}
                       alt={item.title}
                       className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
                     />
                   </div>
 
                   <div className="text-gray-300 text-center pt-5 font-custom4">
-                    {item.director || "Unknown"}
+                    {item.director || item.studio || "Unknown"}
                   </div>
                 </div>
 
@@ -178,17 +174,27 @@ export default function Details() {
                     </div>
 
                     {/* Runtime / Seasons */}
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
+                    {item.type !== "manga" ? <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
                       {item.seasons ? (
                         <span className="text-sm font-medium">
                           {item.seasons} {seasonOrSeasons(item.seasons)}
+                        </span>
+                      ) : item.type === "anime" ? (item.animeType == "Movie" ? "Movie" :
+                        <span className="text-sm font-medium">
+                          {item.episodes} {item.episodes > 1 ? "Episodes" : "Episode"}
                         </span>
                       ) : (
                         <span className="text-sm font-medium">
                           {formatRuntime(item.runtime)}
                         </span>
                       )}
-                    </div>
+                    </div> :
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
+                        <span className="text-sm font-medium">
+                          {item.status}
+                        </span>
+                      </div>
+                    }
 
                     {/* Release Year */}
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
@@ -315,7 +321,7 @@ export default function Details() {
               </div>
 
               <div className="font-bold text-sm">
-                {item.releaseDate || "TBA"}
+                {item.releaseDate.length > 10 ? item.releaseDate.substring(0, 10) : item.releaseDate || "TBA"}
               </div>
             </div>
 
@@ -325,7 +331,7 @@ export default function Details() {
               </div>
 
               <div className="font-bold text-sm capitalize">
-                {item.type}
+                {item.type === "manga" ? item.mangaType : item.type}
               </div>
             </div>
           </div>
@@ -347,8 +353,7 @@ export default function Details() {
                     <div className="aspect-[2/3] w-full overflow-hidden">
                       <img
                         src={
-                          cast.image ? `https://image.tmdb.org/t/p/original${cast.image}` :
-                            "https://via.placeholder.com/300x450?text=No+Image"
+                          (item.type === "anime" || item.type === "manga") ? cast.image : `https://image.tmdb.org/t/p/original${cast.image}`
                         }
                         alt={cast.name}
                         className="w-full h-full object-cover"

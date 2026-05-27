@@ -3,20 +3,11 @@ import { useNavigate } from 'react-router-dom';
 export default function Card({ item, title, isUpcoming, isAnime, isManga }) {
   const navigate = useNavigate();
 
-  console.log(title);
-
-  function whatType(title) {
-    if (item?.type) return item.type.toLowerCase();
-    if (isAnime) return "anime";
-    if (isManga) return "manga";
-
-    const lowerTitle = title?.toLowerCase() || "";
-    if (lowerTitle.includes("series") || lowerTitle === "tv") return "series";
-    if (lowerTitle.includes("movie")) return "movie";
-    if (lowerTitle.includes("manga")) return "manga";
-    if (lowerTitle.includes("anime")) return "anime";
-
-    return "movie"; // fallback
+  function whatType() {
+    if (item?.type) {
+      if (item.type === "tv") return "series";
+    }
+    return item.type.toLowerCase()
   }
 
   function handleOnClick() {
