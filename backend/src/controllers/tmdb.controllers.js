@@ -89,9 +89,11 @@ export const upcomingSeries = asyncHandler(async (req, res) => {
 
   const minDate = today.toISOString().split('T')[0];
 
-  const maxDate = new Date(today.setMonth(today.getMonth() + 2))
-    .toISOString()
-    .split('T')[0];
+  // Create separate date object
+  const futureDate = new Date();
+  futureDate.setMonth(futureDate.getMonth() + 2);
+
+  const maxDate = futureDate.toISOString().split('T')[0];
 
   const result = await axiosInstance.get('/discover/tv', {
     params: {
@@ -100,17 +102,20 @@ export const upcomingSeries = asyncHandler(async (req, res) => {
       page: 1,
       sort_by: 'popularity.desc',
 
+      // Upcoming within next 2 months
       'first_air_date.gte': minDate,
       'first_air_date.lte': maxDate,
     },
   });
 
-  const upcomingShows = result.data.results.map((show) => ({
-    id: show.id,
-    title: show.name,
-    type: 'tv',
-    poster: show.poster_path,
-  }));
+  const upcomingShows = result.data.results
+    .filter((show) => show.poster_path !== null)
+    .map((show) => ({
+      id: show.id,
+      title: show.name,
+      type: 'tv',
+      poster: show.poster_path,
+    }));
 
   cache.set(cacheKey, upcomingShows, 3600);
 
@@ -158,12 +163,14 @@ export const upcomingMovies = asyncHandler(async (req, res) => {
     },
   });
 
-  const upcomingMovies = result.data.results.map((movie) => ({
-    id: movie.id,
-    title: movie.title,
-    type: 'movie',
-    poster: movie.poster_path,
-  }));
+  const upcomingMovies = result.data.results
+    .filter((movie) => movie.poster_path !== null)
+    .map((movie) => ({
+      id: movie.id,
+      title: movie.title,
+      type: 'movie',
+      poster: movie.poster_path,
+    }));
 
   cache.set(cacheKey, upcomingMovies, 3600);
 
@@ -322,12 +329,14 @@ export const trendingMovies = asyncHandler(async (req, res) => {
 
   const result = await axiosInstance.get('/trending/movie/week');
 
-  const movies = result.data.results.map((movie) => ({
-    id: movie.id,
-    title: movie.title,
-    type: 'movie',
-    poster: movie.poster_path,
-  }));
+  const movies = result.data.results
+    .filter((movie) => movie.poster_path !== null)
+    .map((movie) => ({
+      id: movie.id,
+      title: movie.title,
+      type: 'movie',
+      poster: movie.poster_path,
+    }));
 
   // Cache for 10 mins
   cache.set(cacheKey, movies, 600);
@@ -353,12 +362,14 @@ export const trendingSeries = asyncHandler(async (req, res) => {
 
   const result = await axiosInstance.get('/trending/tv/week');
 
-  const shows = result.data.results.map((show) => ({
-    id: show.id,
-    title: show.name,
-    type: 'series',
-    poster: show.poster_path,
-  }));
+  const shows = result.data.results
+    .filter((show) => show.poster_path !== null)
+    .map((show) => ({
+      id: show.id,
+      title: show.name,
+      type: 'series',
+      poster: show.poster_path,
+    }));
 
   // Cache for 10 mins
   cache.set(cacheKey, shows, 600);
