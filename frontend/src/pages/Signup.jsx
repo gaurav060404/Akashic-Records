@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useRecoilValueLoadable } from 'recoil';
-import { carouselPosters } from '../store/store.jsx';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios'; // Import axios
 import '../index.css';
 import logo from '../assets/logo.png';
+import { useQuery } from '@tanstack/react-query';
+import { carouselPosters } from '../services/homePageSeries.js';
 
 // Create axios instance with base URL and default configs
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || 'https://akashic-records-backend.vercel.app/api/auth',
+  baseURL: `${import.meta.env.VITE_BACKEND_URL}/auth`,
   withCredentials: true,
 });
 
@@ -18,9 +18,17 @@ const Signup = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const postersLoadable = useRecoilValueLoadable(carouselPosters);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+
+  const {
+    data: carouselData,
+    isLoading: carouselLoading,
+    isError: carouselError
+  } = useQuery({
+    queryKey: ["carousel-posters"],
+    queryFn: carouselPosters
+  });
 
   // Form data state
   const [formData, setFormData] = useState({
@@ -39,7 +47,7 @@ const Signup = () => {
 
   // Handle Google sign up
   const handleGoogleSignup = () => {
-    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/google`;
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/google`;
   };
 
   // Handle form submission
@@ -53,6 +61,8 @@ const Signup = () => {
 
       // Store token
       localStorage.setItem('token', response.data.token);
+      // Set Authorization header for subsequent requests
+      api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
 
       const userData = {
         name: response.data.user.name,  // Fixed: was data.user.name
@@ -78,14 +88,15 @@ const Signup = () => {
 
   // Rotate through posters every 5 seconds
   useEffect(() => {
-    if (postersLoadable.state !== 'hasValue' || postersLoadable.contents.length === 0) return;
+    if (carouselLoading) return;
+    if (!carouselData || carouselData.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentSlide(prev => (prev + 1) % postersLoadable.contents.length);
+      setCurrentSlide(prev => (prev + 1) % carouselData.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [postersLoadable.state, postersLoadable.contents]);
+  }, [carouselLoading, carouselData]);
 
   // Toggle password visibility
   const togglePasswordVisibility = () => {
@@ -93,7 +104,7 @@ const Signup = () => {
   };
 
   // Loading state
-  if (postersLoadable.state === 'loading') {
+  if (carouselLoading) {
     return (
       <div className='h-screen flex justify-center items-center bg-black'>
         <button disabled type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center">
@@ -108,16 +119,13 @@ const Signup = () => {
   }
 
   // Error state
-  if (postersLoadable.state === 'hasError') {
+  if (carouselError) {
     return (
       <div className='h-screen flex items-start justify-center bg-black text-white'>
         Oops!! Something Went Wrong
       </div>
     );
   }
-
-  // Loaded state - now we can safely use postersLoadable.contents
-  const posters = postersLoadable.contents;
 
   return (
     <div className="signup-container">
@@ -139,8 +147,8 @@ const Signup = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.8 }}
               style={{
-                backgroundImage: posters[currentSlide] ?
-                  `url(https://image.tmdb.org/t/p/original${posters[currentSlide].backDropPath})` :
+                backgroundImage: carouselData?.[currentSlide] ?
+                  `url(https://image.tmdb.org/t/p/original${carouselData[currentSlide].backdrop})` :
                   'none'
               }}
             />
@@ -155,7 +163,7 @@ const Signup = () => {
 
             {/* Dots indicator */}
             <div className="carousel-dots">
-              {posters.map((_, index) => (
+              {carouselData?.map((_, index) => (
                 <span
                   key={index}
                   className={`dot ${index === currentSlide ? 'active' : ''}`}
@@ -171,7 +179,7 @@ const Signup = () => {
       <div className="form-side">
         <div className="form-content">
           <h1>Create an account</h1>
-          <p className="account-prompt">Already have an account? <a href="/login">Log in</a></p>
+          <p className="account-prompt">Already have an account? <Link to="/login">Log in</Link></p>
 
           {/* Show error message if any */}
           {error && (
@@ -223,6 +231,8 @@ const Signup = () => {
                 type="button"
                 className="password-toggle"
                 onClick={togglePasswordVisibility}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-pressed={showPassword}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
@@ -245,6 +255,7 @@ const Signup = () => {
                 type="button"
                 className="google-btn"
                 onClick={handleGoogleSignup}
+                aria-label="Sign up with Google"
               >
                 <svg viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />

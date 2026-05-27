@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import { useRecoilState } from "recoil";
-import { slideIndex } from "../store/store";
 import { Link } from "react-router-dom";
 
 export default function Carousel({ images }) {

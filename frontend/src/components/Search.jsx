@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useRecoilValueLoadable } from 'recoil';
-import { searchResults } from '../store/store';
 import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 

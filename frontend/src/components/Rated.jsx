@@ -1,8 +1,6 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import HorizontalCard from './HorizontalCard';
-import { useSetRecoilState } from 'recoil';
-import { ratedPosterState } from '../store/store';
 
 export default function Rated({ rated, title, isRated }) {
     return (

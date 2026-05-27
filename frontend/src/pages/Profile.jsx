@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { useRecoilState } from "recoil";
-import { watchlistState } from "../store/store.jsx";
 import { fetchWatchlist } from "../services/watchlistService";
 import { toggleWatchlistItem } from "../services/watchlistService";
 import Navbar from "../components/Navbar";

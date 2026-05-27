@@ -4,7 +4,6 @@ import { Link, useLocation } from 'react-router-dom';
 import SearchBtn from '../components/SearchBtn';
 import Grid from '../components/Grid';
 import { useRecoilValue } from 'recoil';
-import { shuffledPostersState } from '../store/store';
 
 export default function AnimeTrending() {
   const location = useLocation();
