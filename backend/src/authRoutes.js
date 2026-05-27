@@ -1,6 +1,13 @@
 import express from 'express';
 import passport from 'passport';
-import { login, signup, logout, googleCallback, getWatchlist, toggleWatchlistItem } from './controllers/authController.js';
+import {
+  login,
+  signup,
+  logout,
+  googleCallback,
+  getWatchlist,
+  toggleWatchlistItem,
+} from './controllers/auth.controller.js';
 import { authenticateToken } from './middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -10,19 +17,21 @@ router.post('/login', login);
 router.post('/logout', authenticateToken, logout);
 
 // Google OAuth routes
-router.get('/google', 
-  passport.authenticate('google', { 
+router.get(
+  '/google',
+  passport.authenticate('google', {
     scope: ['profile', 'email'],
-    session: false 
-  })
+    session: false,
+  }),
 );
 
-router.get('/google/callback',
-  passport.authenticate('google', { 
+router.get(
+  '/google/callback',
+  passport.authenticate('google', {
     failureRedirect: '/login',
-    session: false
+    session: false,
   }),
-  googleCallback
+  googleCallback,
 );
 
 router.get('/watchlist', authenticateToken, getWatchlist);
