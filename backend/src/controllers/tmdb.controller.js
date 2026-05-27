@@ -62,6 +62,7 @@ export const getTrending = asyncHandler(async (req, res) => {
     id: item.id,
     title: item.title || item.name,
     poster: item.poster_path,
+    type: item.media_type,
   }));
 
   cache.set(cacheKey, trendingItems);
@@ -367,7 +368,7 @@ export const trendingSeries = asyncHandler(async (req, res) => {
     .map((show) => ({
       id: show.id,
       title: show.name,
-      type: 'series',
+      type: 'tv',
       poster: show.poster_path,
     }));
 
