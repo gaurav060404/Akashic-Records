@@ -105,9 +105,14 @@ export const getDetails = asyncHandler(async (req, res) => {
       animeType: anime.type,
     };
   } else if (type === 'manga') {
-    const result = await axios.get(`https://api.jikan.moe/v4/manga/${id}/full`);
+    const [detailsRes, charactersRes] = await Promise.all([
+      axios.get(`https://api.jikan.moe/v4/manga/${id}/full`),
+      axios.get(`https://api.jikan.moe/v4/manga/${id}/characters`),
+    ]);
 
-    const manga = result.data.data;
+    const manga = detailsRes.data.data;
+
+    const characters = charactersRes.data.data || [];
 
     data = {
       id: manga.mal_id,
@@ -129,9 +134,16 @@ export const getDetails = asyncHandler(async (req, res) => {
       director: manga.authors?.[0]?.name || 'Unknown',
       serializations: manga.serializations?.map((s) => s.name) || [],
       trailer: null,
-      credits: [],
+
+      credits: characters.slice(0, 10).map((char) => {
+        return {
+          image: char.character?.images?.jpg?.image_url || null,
+          name: char.character?.name || 'Unknown',
+          character: char.role || null,
+        };
+      }),
       type: 'manga',
-      mangaType: manga.type
+      mangaType: manga.type,
     };
   } else {
     throw new ApiError(400, 'Invalid type');

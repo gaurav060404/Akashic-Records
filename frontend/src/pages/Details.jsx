@@ -180,9 +180,14 @@ export default function Details() {
                           {item.seasons} {seasonOrSeasons(item.seasons)}
                         </span>
                       ) : item.type === "anime" ? (item.animeType == "Movie" ? "Movie" :
-                        <span className="text-sm font-medium">
-                          {item.episodes} {item.episodes > 1 ? "Episodes" : "Episode"}
-                        </span>
+                        (item.episodes === null ?
+                          <span className="text-sm font-medium">
+                            {item.status}
+                          </span>
+                          :
+                          <span className="text-sm font-medium">
+                            {item.episodes} {item.episodes > 1 ? "Episodes" : "Episode"}
+                          </span>)
                       ) : (
                         <span className="text-sm font-medium">
                           {formatRuntime(item.runtime)}
