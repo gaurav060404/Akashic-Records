@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function Profile() {
-  const [watchlist, setWatchlist] = useRecoilState(watchlistState);
+  const [watchlist, setWatchlist] = useState([]);
   const [filter, setFilter] = useState("all");
   const [user, setUser] = useState({ name: "User", avatar: "https://i.pravatar.cc/150?img=11" });
   const [loading, setLoading] = useState(false);
@@ -19,10 +19,10 @@ export default function Profile() {
         const userData = JSON.parse(storedUser);
         setUser({
           name: userData.name || "User",
-          avatar: userData.avatar || 
-                  userData.picture || 
-                  (userData.googleUser?.picture) || 
-                  "https://i.pravatar.cc/150?img=11"
+          avatar: userData.avatar ||
+            userData.picture ||
+            (userData.googleUser?.picture) ||
+            "https://i.pravatar.cc/150?img=11"
         });
       } catch (error) {
         console.error("Failed to parse user data:", error);
@@ -36,9 +36,10 @@ export default function Profile() {
       try {
         setLoading(true);
         const result = await fetchWatchlist();
-        if (result.watchlist) {
-          setWatchlist(result.watchlist);
-        }
+        // Support several possible response shapes from the backend/service
+        // result may be: { watchlist: [...] } or an array directly or { data: [...] }
+        const list = result?.watchlist ?? result?.data ?? result;
+        setWatchlist(Array.isArray(list) ? list : []);
       } catch (error) {
         console.error("Error syncing watchlist:", error);
       } finally {
@@ -51,43 +52,29 @@ export default function Profile() {
 
   // Helper function to determine item type
   const getItemType = (item) => {
-    // First check explicit type property
-    if (item.type) {
-      return item.type.toLowerCase();
-    }
-    // Then check media_type property (commonly used in API responses)
-    else if (item.media_type) {
-      return item.media_type.toLowerCase();
-    }
-    // Then check title or name properties for clues
-    else if (item.posterName?.toLowerCase().includes("anime") ||
-      item.title?.toLowerCase().includes("anime") ||
-      item.isAnime) {
-      return "anime";
-    }
-    else if (item.posterName?.toLowerCase().includes("movie") ||
-      item.title?.toLowerCase() === "movies" ||
-      item.title?.toLowerCase().includes("movie")) {
-      return "movie";
-    }
-    else if (item.posterName?.toLowerCase().includes("series") ||
-      item.title?.toLowerCase() === "series" ||
-      item.title?.toLowerCase().includes("tv")) {
-      return "series";
-    }
-    // Default fallback
+    if (!item) return "unknown";
+    if (item.type) return String(item.type).toLowerCase();
+    if (item.media_type) return String(item.media_type).toLowerCase();
+
+    const posterName = item.posterName ? String(item.posterName).toLowerCase() : "";
+    const title = item.title ? String(item.title).toLowerCase() : "";
+
+    if (posterName.includes("anime") || title.includes("anime") || item.isAnime) return "anime";
+    if (posterName.includes("movie") || title === "movies" || title.includes("movie")) return "movie";
+    if (posterName.includes("series") || title === "series" || title.includes("tv")) return "series";
+
     return "unknown";
   };
 
   // Count items by type
   const counts = {
-    movies: watchlist.filter(item => getItemType(item).includes("movie")).length,
-    series: watchlist.filter(item => getItemType(item).includes("series") || getItemType(item).includes("tv")).length,
-    anime: watchlist.filter(item => getItemType(item).includes("anime")).length
+    movies: (watchlist || []).filter(item => getItemType(item).includes("movie")).length,
+    series: (watchlist || []).filter(item => getItemType(item).includes("series") || getItemType(item).includes("tv")).length,
+    anime: (watchlist || []).filter(item => getItemType(item).includes("anime")).length
   };
 
   // Filter items by category
-  const filteredItems = watchlist.filter(item => {
+  const filteredItems = (watchlist || []).filter(item => {
     if (filter === "all") return true;
     return getItemType(item).includes(filter.toLowerCase());
   });
@@ -113,11 +100,11 @@ export default function Profile() {
     try {
       // Store item ID before removing
       const itemId = item.id;
-      
+
       // Optimistically update UI immediately
       const previousWatchlist = [...watchlist];
       setWatchlist(watchlist.filter(w => w.id !== itemId));
-      
+
       // Then sync with backend
       const token = localStorage.getItem("token");
       if (token) {
@@ -212,8 +199,8 @@ export default function Profile() {
             <button
               onClick={() => setFilter("all")}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${filter === "all"
-                  ? "bg-blue-600 text-white"
-                  : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
+                ? "bg-blue-600 text-white"
+                : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
                 }`}
             >
               All
@@ -221,8 +208,8 @@ export default function Profile() {
             <button
               onClick={() => setFilter("movie")}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all mx-2 ${filter === "movie"
-                  ? "bg-blue-600 text-white"
-                  : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
+                ? "bg-blue-600 text-white"
+                : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
                 }`}
             >
               Movies
@@ -230,8 +217,8 @@ export default function Profile() {
             <button
               onClick={() => setFilter("series")}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all mx-2 ${filter === "series"
-                  ? "bg-blue-600 text-white"
-                  : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
+                ? "bg-blue-600 text-white"
+                : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
                 }`}
             >
               Series
@@ -239,8 +226,8 @@ export default function Profile() {
             <button
               onClick={() => setFilter("anime")}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${filter === "anime"
-                  ? "bg-blue-600 text-white"
-                  : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
+                ? "bg-blue-600 text-white"
+                : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
                 }`}
             >
               Anime
@@ -312,9 +299,9 @@ export default function Profile() {
                     {/* Type Badge */}
                     <div className="absolute top-3 right-3">
                       <div className={`${itemType.includes("movie") ? "bg-purple-600/90" :
-                          itemType.includes("series") || itemType.includes("tv") ? "bg-pink-600/90" :
-                            itemType.includes("anime") ? "bg-green-600/90" :
-                              "bg-gray-600/90"
+                        itemType.includes("series") || itemType.includes("tv") ? "bg-pink-600/90" :
+                          itemType.includes("anime") ? "bg-green-600/90" :
+                            "bg-gray-600/90"
                         } text-xs text-white px-2 py-1 rounded-md font-medium`}>
                         {itemType.includes("movie") ? "Movie" :
                           itemType.includes("series") || itemType.includes("tv") ? "Series" :
