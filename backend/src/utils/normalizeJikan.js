@@ -4,6 +4,6 @@ export const normalizeJikan = (item, type) => ({
   poster: item.images?.jpg?.large_image_url || null,
   overview: item.synopsis,
   rating: item.score,
-  year: item.year || null,
+  year: item.year || item.status || null,
   type,
 });

@@ -60,7 +60,7 @@ export const searchMedia = async (query, type, page) => {
     case 'movie':
     case 'tv': {
       const tmdbResults = await searchTMDB(query, type, page);
-      results = tmdbResults.map(normalizeTMDB);
+      results = tmdbResults.map((item) => normalizeTMDB(item, type));
       break;
     }
     case 'anime': {
@@ -82,13 +82,12 @@ export const searchMedia = async (query, type, page) => {
       ]);
 
       results = [
-        ...tmdbResults.map(normalizeTMDB),
+        ...tmdbResults.map((item) => normalizeTMDB(item, item.media_type)),
         ...animeResults.map((item) => normalizeJikan(item, 'anime')),
         ...mangaResults.map((item) => normalizeJikan(item, 'manga')),
       ];
       break;
     }
   }
-
   return results;
 };

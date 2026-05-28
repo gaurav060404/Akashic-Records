@@ -1,4 +1,4 @@
-export const normalizeTMDB = (item) => ({
+export const normalizeTMDB = (item, type) => ({
   id: item.id,
   title: item.title || item.name,
   poster: item.poster_path
@@ -10,5 +10,5 @@ export const normalizeTMDB = (item) => ({
     item.release_date?.split('-')[0] ||
     item.first_air_date?.split('-')[0] ||
     null,
-  type: item.media_type || 'movie',
+  type: type || item.media_type || null,
 });

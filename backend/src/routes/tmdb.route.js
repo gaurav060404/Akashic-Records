@@ -35,6 +35,6 @@ router.get('/series/top-rated', topRatedSeries);
 router.get('/anime/top-rated', topRatedAnimes);
 router.get('/manga/recommended', recommendedMangas);
 router.get('/manga/top-rated', topRatedMangas);
-router.get('/search', search);
+router.get('/search', search);  
 
 export default router;
