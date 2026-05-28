@@ -1,10 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useQuery } from "@tanstack/react-query";
 import { getDetails } from "../services/detailsService.js";
 // import { toggleWatchlistItem } from "../services/watchlistService";
 import { toast } from "react-hot-toast";
+import { toggleWatchlistItem, fetchWatchlist } from "../services/watchlistService";
 
 export default function Details() {
   const navigate = useNavigate();
@@ -21,9 +22,30 @@ export default function Details() {
     queryKey: ["details", type, id],
     queryFn: () => getDetails(type, id),
     onSuccess: (data) => {
-      setIsInWatchlist(data?.isInWatchlist || false);
+      // we'll determine watchlist membership separately after fetching watchlist
     },
   });
+
+  // Determine if the loaded item is already in the user's watchlist
+  useEffect(() => {
+    const checkWatchlist = async () => {
+      if (!item) return;
+      try {
+        const result = await fetchWatchlist();
+        const list = result?.watchlist ?? result?.data ?? result ?? [];
+
+        const computeId = (it) => (it?.id ?? it?._id ?? it?.tmdbId ?? it?.imdbId ?? it?.title ?? '').toString();
+        const itemId = computeId(item);
+
+        const found = Array.isArray(list) && list.some(i => computeId(i) === itemId);
+        setIsInWatchlist(!!found);
+      } catch (err) {
+        console.error('Failed to fetch watchlist for details page', err);
+      }
+    };
+
+    checkWatchlist();
+  }, [item]);
 
   const handleWatchlistToggle = async () => {
     const token = localStorage.getItem("token");
@@ -39,12 +61,15 @@ export default function Details() {
 
       const result = await toggleWatchlistItem(item);
 
-      setIsInWatchlist(result.isInWatchlist);
+      // Expected shape: { action: 'added'|'removed', watchlist: [...] }
+      const added = result?.action === 'added';
+      setIsInWatchlist(added);
 
-      toast.success(result.message);
+      toast.success(added ? 'Added to watchlist' : 'Removed from watchlist');
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to update watchlist");
+      console.error('Watchlist toggle error', error);
+      const msg = error?.message ?? 'Failed to update watchlist';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

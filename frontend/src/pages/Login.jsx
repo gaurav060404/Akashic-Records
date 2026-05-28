@@ -59,8 +59,6 @@ const Login = () => {
     try {
       const response = await api.post('/login', formData);
 
-      console.log(response.data);
-
       // Store token
       localStorage.setItem('token', response.data.token);
       // Set Authorization header for subsequent requests

@@ -34,7 +34,4 @@ router.get(
   googleCallback,
 );
 
-router.get('/watchlist', authenticateToken, getWatchlist);
-router.post('/watchlist/toggle', authenticateToken, toggleWatchlistItem);
-
 export default router;

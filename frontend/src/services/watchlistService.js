@@ -10,14 +10,19 @@ export const fetchWatchlist = async () => {
 
     const response = await axios.get(`${API_URL}/watchlist`, {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
-    
+
     return response.data;
   } catch (error) {
-    console.error("Error fetching watchlist:", error);
-    return { watchlist: [] };
+    console.error("Error fetching watchlist:", error?.response ?? error);
+    // Surface server-provided message when available
+    const msg =
+      error?.response?.data?.error ??
+      error?.response?.data?.message ??
+      error?.message;
+    throw new Error(msg || "Error fetching watchlist");
   }
 };
 
@@ -27,20 +32,20 @@ export const toggleWatchlistItem = async (item) => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("Not authenticated");
 
-    const response = await axios.post(
-      `${API_URL}/watchlist/toggle`,
-      item,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      }
-    );
-    
+    const response = await axios.post(`${API_URL}/watchlist/toggle`, item, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
     return response.data;
   } catch (error) {
-    console.error("Error updating watchlist:", error);
-    throw error;
+    console.error("Error updating watchlist:", error?.response ?? error);
+    const msg =
+      error?.response?.data?.error ??
+      error?.response?.data?.message ??
+      error?.message;
+    throw new Error(msg || "Error updating watchlist");
   }
 };
