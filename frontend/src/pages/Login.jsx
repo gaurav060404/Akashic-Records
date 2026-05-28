@@ -39,7 +39,7 @@ const Login = () => {
     email: '',
     password: ''
   });
-  
+
   // Handle form data changes
   const handleChange = (e) => {
     setFormData({
@@ -52,27 +52,32 @@ const Login = () => {
   const handleGoogleLogin = () => {
     window.location.href = `${authBaseUrl}/google`;
   };
-  
+
   // Handle login submission
   async function handleLogin(e) {
-    console.log(authBaseUrl);
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
     try {
       const response = await api.post('/login', formData);
+      const responseData = response?.data ?? {};
+      const token = responseData.token ?? responseData.accessToken ?? responseData.jwt;
+      const user = responseData.user ?? responseData.data?.user ?? responseData.profile ?? responseData.userData ?? {};
+
+      if (!token) {
+        throw new Error('Login response missing token');
+      }
 
       // Store token
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('token', token);
       // Set Authorization header for subsequent requests
-      api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       const userData = {
-        name: response.data.user.name,
-        avatar: response.data.user.avatar,
-        // other user properties...
-        id: response.data.user.id
+        name: user.name || user.fullName || user.username || 'User',
+        avatar: user.avatar || user.picture || user.photoURL || 'https://i.pravatar.cc/150?img=11',
+        id: user.id || user._id || user.userId || ''
       };
       localStorage.setItem('user', JSON.stringify(userData));
 
