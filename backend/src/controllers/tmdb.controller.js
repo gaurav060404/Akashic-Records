@@ -3,6 +3,7 @@ import ApiResponse from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import cache from '../utils/cache.js';
+import { searchMedia } from '../utils/searchService.js';
 
 const date = new Date();
 const year = date.getFullYear();
@@ -796,4 +797,18 @@ export const recommendedMangas = asyncHandler(async (req, res) => {
         'Recommended mangas fetched successfully',
       ),
     );
+});
+
+export const search = asyncHandler(async (req, res) => {
+  const { q, type = 'all', page = 1 } = req.query;
+
+  if (!q) {
+    throw new ApiError(400, 'Search query is required');
+  }
+
+  const data = await searchMedia(q, type, page);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, data, 'Search results fetched successfully'));
 });
