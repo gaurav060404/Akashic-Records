@@ -50,33 +50,21 @@ export default function Profile() {
     syncWatchlist();
   }, []);
 
-  // Helper function to determine item type
-  const getItemType = (item) => {
-    if (!item) return "unknown";
-    if (item.type) return String(item.type).toLowerCase();
-    if (item.media_type) return String(item.media_type).toLowerCase();
+  // Lightweight type getter that uses `item.type` (or `media_type`) as source of truth
+  const getType = (item) => String(item?.type ?? item?.media_type ?? "").toLowerCase();
 
-    const posterName = item.posterName ? String(item.posterName).toLowerCase() : "";
-    const title = item.title ? String(item.title).toLowerCase() : "";
-
-    if (posterName.includes("anime") || title.includes("anime") || item.isAnime) return "anime";
-    if (posterName.includes("movie") || title === "movies" || title.includes("movie")) return "movie";
-    if (posterName.includes("series") || title === "series" || title.includes("tv")) return "series";
-
-    return "unknown";
-  };
-
-  // Count items by type
+  // Count items by type using `type` field
   const counts = {
-    movies: (watchlist || []).filter(item => getItemType(item).includes("movie")).length,
-    series: (watchlist || []).filter(item => getItemType(item).includes("series") || getItemType(item).includes("tv")).length,
-    anime: (watchlist || []).filter(item => getItemType(item).includes("anime")).length
+    movies: (watchlist || []).filter(item => getType(item).includes("movie")).length,
+    series: (watchlist || []).filter(item => getType(item).includes("series") || getType(item).includes("tv")).length,
+    anime: (watchlist || []).filter(item => getType(item).includes("anime")).length,
+    manga: (watchlist || []).filter(item => getType(item).includes("manga")).length
   };
 
   // Filter items by category
   const filteredItems = (watchlist || []).filter(item => {
     if (filter === "all") return true;
-    return getItemType(item).includes(filter.toLowerCase());
+    return getType(item).includes(filter.toLowerCase());
   });
 
   // Animation variants
@@ -98,12 +86,18 @@ export default function Profile() {
   // Remove from watchlist with backend sync
   const removeFromWatchlist = async (item) => {
     try {
-      // Store item ID before removing
-      const itemId = item.id;
+      // Store item ID before removing (support multiple id shapes)
+      const itemId = item.id ?? item._id ?? item.tmdbId ?? item.mal_id;
+
+      // Helper to check id equality across different fields
+      const matchesId = (w) => {
+        const wid = w?.id ?? w?._id ?? w?.tmdbId ?? w?.mal_id;
+        return String(wid) === String(itemId);
+      };
 
       // Optimistically update UI immediately
       const previousWatchlist = [...watchlist];
-      setWatchlist(watchlist.filter(w => w.id !== itemId));
+      setWatchlist(watchlist.filter(w => !matchesId(w)));
 
       // Then sync with backend
       const token = localStorage.getItem("token");
@@ -184,6 +178,12 @@ export default function Profile() {
                 </div>
                 <div className="text-sm text-gray-400">Anime</div>
               </div>
+              <div className="flex flex-col items-center">
+                <div className="text-4xl font-bold text-pink-400">
+                  {counts.manga}
+                </div>
+                <div className="text-sm text-gray-400">Manga</div>
+              </div>
             </div>
           </div>
         </div>
@@ -232,6 +232,15 @@ export default function Profile() {
             >
               Anime
             </button>
+            <button
+              onClick={() => setFilter("manga")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${filter === "manga"
+                ? "bg-blue-600 text-white"
+                : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
+                }`}
+            >
+              Manga
+            </button>
           </div>
         </div>
 
@@ -244,7 +253,7 @@ export default function Profile() {
               className="w-32 h-32 mx-auto mb-4"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.outerHTML = '<div class="text-9xl mb-4">🍿</div>';
+                e.target.src = "/popcorn.png";
               }}
             />
             <p className="text-gray-400 text-xl mb-6">Your watchlist is empty</p>
@@ -261,28 +270,39 @@ export default function Profile() {
             initial="hidden"
             animate="show"
           >
-            {filteredItems.map((item) => {
-              const itemType = getItemType(item);
+            {filteredItems.map((item, idx) => {
+              const itemType = getType(item);
+              const itemId = item.id ?? item._id ?? item.tmdbId ?? item.mal_id ?? idx;
+              const posterPath = item.posterPath ?? item.poster_path ?? item.poster ?? item.image ?? item.thumbnail ?? "";
+
+              const posterSrc = posterPath
+                ? posterPath.startsWith("http")
+                  ? posterPath
+                  : item.isAnime
+                    ? posterPath
+                    : `https://image.tmdb.org/t/p/w500${posterPath}`
+                : "/popcorn.png";
+
               return (
                 <motion.div
-                  key={item.id}
+                  key={itemId}
                   className="bg-[#1a1b29] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group border border-[#252636]"
                   variants={item}
                   whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 >
                   <div className="relative">
                     <img
-                      src={
-                        item.isAnime
-                          ? item.posterPath
-                          : `https://image.tmdb.org/t/p/w500${item.posterPath}`
-                      }
-                      alt={item.posterName || item.title}
+                      src={posterSrc}
+                      alt={item.posterName || item.title || "Poster"}
                       className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-100"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/popcorn.png";
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                       <Link
-                        to={`/details/${item.id}`}
+                        to={`/details/${itemId}`}
                         state={{ poster: item }}
                         className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-sm font-medium transition-all"
                       >
@@ -293,7 +313,7 @@ export default function Profile() {
                     {/* Rating Badge */}
                     <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-yellow-400 px-2 py-1 rounded-md text-sm font-bold flex items-center gap-1">
                       <span>★</span>
-                      <span>{(item.rating || 0).toFixed(1)}</span>
+                      <span>{(Number(item.rating) || 0).toFixed(1)}</span>
                     </div>
 
                     {/* Type Badge */}
@@ -305,7 +325,7 @@ export default function Profile() {
                         } text-xs text-white px-2 py-1 rounded-md font-medium`}>
                         {itemType.includes("movie") ? "Movie" :
                           itemType.includes("series") || itemType.includes("tv") ? "Series" :
-                            itemType.includes("anime") ? "Anime" : "Unknown"}
+                            itemType.includes("anime") ? "Anime" : "Manga"}
                       </div>
                     </div>
 
@@ -323,7 +343,7 @@ export default function Profile() {
 
                   <div className="p-3">
                     <h3 className="font-bold text-lg truncate text-white">
-                      {item.posterName || item.title}
+                      {item.name || item.title}
                     </h3>
                     <p className="text-gray-400 text-sm line-clamp-2 mt-2 h-10">
                       {item.overview || "No description available"}

@@ -7,11 +7,14 @@ import '../index.css';
 import logo from '../assets/logo.png';
 import { useQuery } from '@tanstack/react-query';
 import { carouselPosters } from '../services/homePageSeries.js';
+import { getAuthBaseUrl } from '../services/authBase';
 
 // Create axios instance with base URL and default configs
+const authBaseUrl = getAuthBaseUrl();
+
+
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_BACKEND_URL
-    }/auth`,
+  baseURL: authBaseUrl,
   withCredentials: true,
 });
 
@@ -36,7 +39,7 @@ const Login = () => {
     email: '',
     password: ''
   });
-
+  
   // Handle form data changes
   const handleChange = (e) => {
     setFormData({
@@ -47,11 +50,12 @@ const Login = () => {
 
   // Handle Google login
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/google`;
+    window.location.href = `${authBaseUrl}/google`;
   };
-
+  
   // Handle login submission
   async function handleLogin(e) {
+    console.log(authBaseUrl);
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
