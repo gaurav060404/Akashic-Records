@@ -6,3 +6,5 @@ const router = Router();
 
 router.post('/', authenticateToken, rateMedia);
 router.get('/user/:mediaType/:mediaId', authenticateToken, getUserRating);
+
+export default router;
