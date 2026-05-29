@@ -7,6 +7,7 @@ import authRoutes from './src/authRoutes.js';
 import tmdbRoutes from './src/routes/tmdb.route.js';
 import detailRoutes from './src/routes/details.route.js';
 import watchlistRoutes from './src/routes/watchlist.route.js';
+import ratingRoutes from './src/routes/rating.route.js';
 import User from './src/models/userModel.js';
 import ApiResponse from './src/utils/ApiResponse.js';
 
@@ -69,6 +70,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tmdb', tmdbRoutes);
 app.use('/api/details', detailRoutes);
 app.use('/api/watchlist', watchlistRoutes);
+app.use('/api/rating', ratingRoutes);
 app.get('/', (req, res) => {
   return res.json(new ApiResponse(200, {}, 'Backend is running'));
 });
