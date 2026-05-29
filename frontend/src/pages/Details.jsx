@@ -6,13 +6,19 @@ import { getDetails } from "../services/detailsService.js";
 // import { toggleWatchlistItem } from "../services/watchlistService";
 import { toast } from "react-hot-toast";
 import { toggleWatchlistItem, fetchWatchlist } from "../services/watchlistService";
+import { useRateMedia } from "../hooks/useRateMedia.js";
+import { useRatingStats, useUserRating } from "../hooks/useRating.js";
 
 export default function Details() {
   const navigate = useNavigate();
   const { type, id } = useParams();
+  const token = localStorage.getItem("token");
   const [showFullOverview, setShowFullOverview] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const [ratingValue, setRatingValue] = useState(1);
+  const [reviewText, setReviewText] = useState("");
+  const [showAllComments, setShowAllComments] = useState(false);
 
   const {
     data: item,
@@ -21,10 +27,75 @@ export default function Details() {
   } = useQuery({
     queryKey: ["details", type, id],
     queryFn: () => getDetails(type, id),
-    onSuccess: (data) => {
+    onSuccess: () => {
       // we'll determine watchlist membership separately after fetching watchlist
     },
   });
+
+  const mediaType = item?.type ?? type;
+  const mediaId = item?.id ?? id;
+  const ratingMutation = useRateMedia();
+  const {
+    data: userRating,
+    isLoading: isUserRatingLoading,
+  } = useUserRating(mediaType, mediaId, {
+    enabled: !!token,
+  });
+  const {
+    data: ratingStats,
+    isLoading: isRatingStatsLoading,
+  } = useRatingStats(mediaType, mediaId);
+
+  const getNumericRating = (value) => {
+    if (value === null || value === undefined) return null;
+    if (typeof value === "number") return value;
+
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
+
+  const getUserRatingValue = (value) => {
+    return getNumericRating(
+      value?.rating ?? value?.value ?? value?.score ?? value?.userRating
+    );
+  };
+
+  const getUserReviewValue = (value) => {
+    return value?.review ?? value?.comment ?? value?.text ?? "";
+  };
+
+  const getStatsValue = (value) => {
+    const averageRating = getNumericRating(
+      value?.averageRating ?? value?.average ?? value?.rating ?? value?.avgRating
+    );
+    const ratingCount =
+      value?.ratingCount ?? value?.count ?? value?.totalRatings ?? value?.votes ?? null;
+    const reviews = Array.isArray(value?.reviews) ? value.reviews : [];
+
+    return { averageRating, ratingCount, reviews };
+  };
+
+  const selectedUserRating = getUserRatingValue(userRating);
+  const selectedUserReview = getUserReviewValue(userRating);
+  const { averageRating, ratingCount, reviews } = getStatsValue(ratingStats);
+  const sortedReviews = [...reviews].sort((left, right) => {
+    const leftTime = new Date(left?.createdAt ?? 0).getTime();
+    const rightTime = new Date(right?.createdAt ?? 0).getTime();
+
+    return rightTime - leftTime;
+  });
+  const visibleReviews = showAllComments ? sortedReviews : sortedReviews.slice(0, 3);
+  const hiddenReviewCount = Math.max(0, sortedReviews.length - visibleReviews.length);
+
+  useEffect(() => {
+    if (selectedUserRating !== null && selectedUserRating !== undefined) {
+      setRatingValue(selectedUserRating);
+    }
+
+    if (selectedUserReview) {
+      setReviewText(selectedUserReview);
+    }
+  }, [selectedUserRating, selectedUserReview]);
 
   // Determine if the loaded item is already in the user's watchlist
   useEffect(() => {
@@ -116,6 +187,43 @@ export default function Details() {
     if (!value) return "Season";
 
     return value > 1 ? "Seasons" : "Season";
+  };
+
+  const communityScoreDisplay =
+    averageRating !== null && averageRating !== undefined
+      ? formatRating(averageRating)
+      : "No ratings\nyet";
+
+  const userScoreDisplay =
+    selectedUserRating !== null && selectedUserRating !== undefined
+      ? selectedUserRating
+      : "—";
+
+  const totalReviewsDisplay = ratingCount ?? 0;
+  const ratingFill = `${((ratingValue - 1) / 9) * 100}%`;
+
+  const handleRatingSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!token) {
+      toast.error("Please login first");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      await ratingMutation.mutateAsync({
+        mediaId,
+        mediaType,
+        rating: ratingValue,
+        review: reviewText,
+      });
+
+      toast.success("Rating saved");
+    } catch (error) {
+      console.error("Rating submit error", error);
+      toast.error(error?.message ?? "Failed to submit rating");
+    }
   };
 
   if (isLoading) {
@@ -365,6 +473,190 @@ export default function Details() {
               </div>
             </div>
           </div>
+
+          {/* Ratings */}
+          <section className="mb-10 rounded-[1.75rem] border border-white/10 bg-[#0c0c0c] overflow-hidden shadow-[0_24px_90px_rgba(0,0,0,0.38)]">
+            <div className="grid gap-0 xl:grid-cols-[1.05fr_0.95fr]">
+              <div className="relative overflow-hidden border-b border-white/10 xl:border-b-0 xl:border-r xl:border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(234,179,8,0.10),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] p-5 sm:p-6 lg:p-8">
+                <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-yellow-500/10 to-transparent pointer-events-none" />
+
+                <div className="flex h-full flex-col justify-between gap-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="text-xs sm:text-sm uppercase tracking-[0.35em] text-white/45">
+                        Community Score
+                      </div>
+                    </div>
+
+                    <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-white/40">
+                      Based on {totalReviewsDisplay} review{Number(totalReviewsDisplay) === 1 ? "" : "s"}
+                    </div>
+                  </div>
+
+                  <div className="">
+                    <div className="text-[clamp(2.75rem,7.5vw,5.5rem)] leading-[0.88] font-serif italic text-white/35 tracking-[-0.04em] whitespace-pre-line">
+                      {isRatingStatsLoading ? "Loading" : communityScoreDisplay}
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[0.98fr_1.02fr]">
+                    <div className="rounded-[1.2rem] border border-white/10 bg-white/4 p-4 sm:p-4">
+                      <div className="text-xs uppercase tracking-[0.3em] text-white/45 mb-2.5">Your Score</div>
+                      <div className="flex items-end justify-between gap-4">
+                        <div className="text-2xl sm:text-3xl font-light text-yellow-400">
+                          {isUserRatingLoading ? "..." : userScoreDisplay}
+                        </div>
+                        <div className="flex items-center gap-1 pb-1">
+                          {Array.from({ length: 10 }).map((_, index) => (
+                            <span
+                              key={index}
+                              className={`h-3 w-3 rounded-full ${index < Math.max(0, Math.min(10, Number(selectedUserRating ?? 0)))
+                                ? "bg-yellow-400/90"
+                                : "bg-white/12"
+                                }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-[1.2rem] border border-white/10 bg-white/4 p-4 sm:p-4">
+                      <div className="text-xs uppercase tracking-[0.3em] text-white/45 mb-2.5">Total Reviews</div>
+                      <div className="text-2xl sm:text-3xl font-light text-white">{totalReviewsDisplay}</div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-[1.2rem] border border-white/10 bg-white/4 p-4 sm:p-4.5 min-h-[5.75rem]">
+                    <div className="mb-3 text-xs uppercase tracking-[0.3em] text-white/45">
+                      Top Comments
+                    </div>
+
+                    {sortedReviews.length > 0 ? (
+                      <div className="space-y-4">
+                        {visibleReviews.map((review, index) => (
+                          <div
+                            key={review?._id ?? `${review?.user?._id ?? "user"}-${review?.createdAt ?? index}`}
+                            className="rounded-[1rem] border border-white/8 bg-black/20 p-3.5"
+                          >
+                            <div className="mb-2 flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="truncate text-sm font-medium text-white">
+                                  {review?.user?.name ?? "Anonymous"}
+                                </div>
+                                <div className="text-[11px] uppercase tracking-[0.22em] text-white/30">
+                                  {review?.createdAt ? new Date(review.createdAt).toLocaleDateString() : "Recently"}
+                                </div>
+                              </div>
+
+                              <div className="shrink-0 rounded-full border border-yellow-400/20 bg-yellow-400/10 px-2 py-1 text-[11px] font-semibold text-yellow-300">
+                                {review?.rating ?? "-"}/10
+                              </div>
+                            </div>
+
+                            <p className="text-sm italic leading-relaxed text-white/65">
+                              {review?.review || "No comment provided."}
+                            </p>
+                          </div>
+                        ))}
+
+                        {sortedReviews.length > 3 ? (
+                          <button
+                            type="button"
+                            onClick={() => setShowAllComments((current) => !current)}
+                            className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-yellow-300 transition-colors hover:text-yellow-200"
+                          >
+                            {showAllComments ? "Show top 3" : `View all ${hiddenReviewCount + visibleReviews.length} reviews`}
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <p className="text-sm sm:text-base italic text-white/55">
+                        No comments yet. Be the first to leave one.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative bg-[radial-gradient(circle_at_top_right,rgba(234,179,8,0.18),transparent_25%),linear-gradient(180deg,rgba(17,17,17,0.96),rgba(12,12,12,0.98))] p-5 sm:p-6 lg:p-8">
+                <div className="flex h-full flex-col">
+                  <div className="mb-5">
+                    <div className="text-xs sm:text-sm uppercase tracking-[0.35em] text-white/45 mb-3">
+                      Rate this title
+                    </div>
+
+                    <p className="text-sm sm:text-base text-white/50 leading-relaxed">
+                      Pick a score from 1 - 10 and leave an optional note.
+                    </p>
+                  </div>
+
+                  {!token ? (
+                    <div className="rounded-[1.2rem] border border-dashed border-white/15 bg-black/20 p-4 text-sm text-gray-300">
+                      Sign in to save your rating and review.
+                    </div>
+                  ) : (
+                    <form className="flex flex-col gap-5" onSubmit={handleRatingSubmit}>
+                      <div>
+                        <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/45">
+                          <span>Score</span>
+                          <span className="text-yellow-400">{ratingValue}</span>
+                        </div>
+
+                        <input
+                          type="range"
+                          min="1"
+                          max="10"
+                          step="1"
+                          value={ratingValue}
+                          onChange={(event) => setRatingValue(Number(event.target.value))}
+                          className="rating-slider w-full"
+                          style={{ "--rating-fill": ratingFill }}
+                        />
+
+                        <div className="mt-3 flex justify-between text-sm text-white/30">
+                          {Array.from({ length: 10 }).map((_, index) => (
+                            <span key={index}>{index + 1}</span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-4 text-xs uppercase tracking-[0.3em] text-white/45">
+                          <label htmlFor="review">Review</label>
+                          <span>Optional</span>
+                        </div>
+
+                        <textarea
+                          id="review"
+                          value={reviewText}
+                          maxLength={300}
+                          onChange={(event) => setReviewText(event.target.value)}
+                          rows="5"
+                          placeholder="What did you think?"
+                          className="w-full min-h-[10.5rem] rounded-[1.2rem] border border-white/10 bg-white/10 px-4 py-3 text-base text-white placeholder:text-white/35 outline-none transition-colors focus:border-yellow-400/60 focus:bg-white/12"
+                        />
+
+                        <div className="text-right text-sm text-white/30">
+                          {reviewText.length} / 300
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={ratingMutation.isPending}
+                        className="inline-flex items-center justify-center gap-2 rounded-[1.35rem] border border-white/20 bg-white/3 px-6 py-4 text-lg font-semibold text-white transition-colors duration-300 hover:bg-white/8 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {ratingMutation.isPending ? (
+                          <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                        ) : null}
+                        Save rating
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
 
           {/* Cast */}
           {item.credits && item.credits.length > 0 && (
