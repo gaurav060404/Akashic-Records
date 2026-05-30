@@ -26,6 +26,14 @@ const ratingSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    title: {
+      type: String,
+      default: '',
+    },
+    poster: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,

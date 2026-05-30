@@ -15,7 +15,7 @@ const fetchMediaReviews = async ({ mediaId, mediaType }) => {
 };
 
 export const rateMedia = asyncHandler(async (req, res) => {
-  const { mediaId, mediaType, rating, review = '' } = req.body;
+  const { mediaId, mediaType, rating, review = '', title, poster } = req.body;
 
   const userId = req.user.id;
 
@@ -29,6 +29,8 @@ export const rateMedia = asyncHandler(async (req, res) => {
       $set: {
         rating,
         review,
+        title,
+        poster,
       },
     },
     {
