@@ -117,3 +117,21 @@ export const getAllRatingsFromUser = asyncHandler(async (req, res) => {
       new ApiResponse(200, ratings, 'Ratings & Reviews fetched successfully'),
     );
 });
+
+export const deleteRating = asyncHandler(async (req, res) => {
+  const { mediaId, mediaType } = req.params;
+
+  const rating = await Rating.findOneAndDelete({
+    user: req.user.id,
+    mediaId,
+    mediaType,
+  });
+
+  if (!rating) {
+    throw new ApiError(404, 'Rating not found');
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, 'Rating/Review deleted successfully'));
+});
