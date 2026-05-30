@@ -5,38 +5,38 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   password: {
-    type: String
+    type: String,
   },
   name: {
     type: String,
-    required: true
+    required: true,
   },
   googleId: {
-    type: String
+    type: String,
   },
   avatar: {
-    type: String
+    type: String,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   watchlist: {
-    type: [mongoose.Schema.Types.Mixed], 
-    default: []
-  }
+    type: [mongoose.Schema.Types.Mixed],
+    default: [],
+  },
 });
 
-userSchema.pre('save', async function() {
+userSchema.pre('save', async function () {
   if (this.password && this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
   }
 });
 
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
   if (!this.password) return false;
   return bcrypt.compare(candidatePassword, this.password);
 };

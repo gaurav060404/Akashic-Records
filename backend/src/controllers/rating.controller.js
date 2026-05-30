@@ -1,6 +1,8 @@
 import Rating from '../models/ratingModel.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import ApiResponse from '../utils/ApiResponse.js';
+import ApiError from '../utils/ApiError.js';
+import User from '../models/userModel.js';
 
 const fetchMediaReviews = async ({ mediaId, mediaType }) => {
   return Rating.find({
@@ -13,7 +15,7 @@ const fetchMediaReviews = async ({ mediaId, mediaType }) => {
 };
 
 export const rateMedia = asyncHandler(async (req, res) => {
-  const { mediaId, mediaType, rating, review } = req.body;
+  const { mediaId, mediaType, rating, review = '' } = req.body;
 
   const userId = req.user.id;
 
@@ -24,12 +26,15 @@ export const rateMedia = asyncHandler(async (req, res) => {
       mediaType,
     },
     {
-      rating,
-      review,
+      $set: {
+        rating,
+        review,
+      },
     },
     {
       upsert: true,
-      returnDocument: 'after',
+      new: true,
+      runValidators: true,
     },
   );
 
@@ -95,4 +100,18 @@ export const getMediaReviews = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, reviews, 'Reviews fetched successfully'));
+});
+
+export const getAllRatingsFromUser = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+
+  const ratings = await Rating.find({ user: id }).sort({
+    updatedAt: -1,
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, ratings, 'Ratings & Reviews fetched successfully'),
+    );
 });
