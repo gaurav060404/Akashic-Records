@@ -18,6 +18,8 @@ const getAuthHeaders = () => {
 export const submitRating = async ({
   mediaId,
   mediaType,
+  title = "",
+  poster = "",
   rating,
   review = "",
 }) => {
@@ -26,6 +28,8 @@ export const submitRating = async ({
     {
       mediaId,
       mediaType,
+      title,
+      poster,
       rating,
       review,
     },
@@ -55,6 +59,14 @@ export const getRatingStats = async (mediaType, mediaId) => {
       headers: getAuthHeaders(),
     },
   );
+
+  return response.data.data;
+};
+
+export const getAllRatingsOfUser = async () => {
+  const response = await axiosInstance.get(`/rating`, {
+    headers: getAuthHeaders(),
+  });
 
   return response.data.data;
 };

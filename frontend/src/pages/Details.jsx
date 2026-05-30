@@ -34,6 +34,8 @@ export default function Details() {
 
   const mediaType = item?.type ?? type;
   const mediaId = item?.id ?? id;
+  const title = item?.title ?? item?.name ?? "";
+  const poster = item?.poster ?? item?.posterPath ?? item?.poster_path ?? item?.image ?? item?.thumbnail ?? "";
   const ratingMutation = useRateMedia();
   const {
     data: userRating,
@@ -215,6 +217,8 @@ export default function Details() {
       await ratingMutation.mutateAsync({
         mediaId,
         mediaType,
+        title,
+        poster,
         rating: ratingValue,
         review: reviewText,
       });

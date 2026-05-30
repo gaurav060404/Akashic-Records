@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
 import { fetchWatchlist } from "../services/watchlistService";
 import { toggleWatchlistItem } from "../services/watchlistService";
+import { getAllRatingsOfUser } from "../services/ratingService";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function Profile() {
   const [watchlist, setWatchlist] = useState([]);
+  const [ratings, setRatings] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [ratingsFilter, setRatingsFilter] = useState("all");
   const [user, setUser] = useState({ name: "User", avatar: "https://i.pravatar.cc/150?img=11" });
   const [loading, setLoading] = useState(false);
+  const [ratingsLoading, setRatingsLoading] = useState(false);
 
   // Get user data including avatar on component mount
   useEffect(() => {
@@ -50,8 +54,62 @@ export default function Profile() {
     syncWatchlist();
   }, []);
 
+  useEffect(() => {
+    const syncRatings = async () => {
+      try {
+        setRatingsLoading(true);
+        const result = await getAllRatingsOfUser();
+
+        const list =
+          result?.ratings ??
+          result?.reviews ??
+          result?.items ??
+          result?.docs ??
+          result?.results ??
+          result?.data ??
+          result;
+
+        setRatings(Array.isArray(list) ? list : []);
+      } catch (error) {
+        console.error("Error syncing ratings:", error);
+      } finally {
+        setRatingsLoading(false);
+      }
+    };
+
+    syncRatings();
+  }, []);
+
   // Lightweight type getter that uses `item.type` (or `media_type`) as source of truth
   const getType = (item) => String(item?.type ?? item?.media_type ?? "").toLowerCase();
+
+  const getRatingType = (item) => String(item?.mediaType ?? item?.media_type ?? item?.type ?? item?.media?.type ?? "").toLowerCase();
+
+  const getRatingId = (item) => item?.mediaId ?? item?.media_id ?? item?.id ?? item?._id ?? item?.media?.id ?? item?.media?._id ?? item?.tmdbId ?? item?.mal_id;
+
+  const getRatingTitle = (item) => item?.media?.title ?? item?.media?.name ?? item?.title ?? item?.name ?? item?.mediaName ?? item?.posterName ?? "Untitled";
+
+  const getRatingPoster = (item) => {
+    const posterPath =
+      item?.media?.posterPath ??
+      item?.media?.poster_path ??
+      item?.posterPath ??
+      item?.poster_path ??
+      item?.poster ??
+      item?.image ??
+      item?.thumbnail ??
+      "";
+
+    if (!posterPath) return "/popcorn.png";
+
+    return posterPath;
+  };
+
+  const getRatingValue = (item) => Number(item?.rating ?? item?.value ?? item?.score ?? item?.userRating ?? 0);
+
+  const getRatingReview = (item) => item?.review ?? item?.comment ?? item?.text ?? "No review provided.";
+
+  const getRatingDate = (item) => item?.createdAt ?? item?.updatedAt ?? item?.date ?? null;
 
   // Count items by type using `type` field
   const counts = {
@@ -65,6 +123,11 @@ export default function Profile() {
   const filteredItems = (watchlist || []).filter(item => {
     if (filter === "all") return true;
     return getType(item).includes(filter.toLowerCase());
+  });
+
+  const filteredRatings = (ratings || []).filter((item) => {
+    if (ratingsFilter === "all") return true;
+    return getRatingType(item).includes(ratingsFilter.toLowerCase());
   });
 
   // Animation variants
@@ -81,6 +144,14 @@ export default function Profile() {
   const item = {
     hidden: { y: 20, opacity: 0 },
     show: { y: 0, opacity: 1 }
+  };
+
+  const ratingCounts = {
+    total: (ratings || []).length,
+    movies: (ratings || []).filter(item => getRatingType(item).includes("movie")).length,
+    series: (ratings || []).filter(item => getRatingType(item).includes("series") || getRatingType(item).includes("tv")).length,
+    anime: (ratings || []).filter(item => getRatingType(item).includes("anime")).length,
+    manga: (ratings || []).filter(item => getRatingType(item).includes("manga")).length,
   };
 
   // Remove from watchlist with backend sync
@@ -354,6 +425,179 @@ export default function Profile() {
             })}
           </motion.div>
         )}
+
+        {/* Ratings & Reviews */}
+        <div className="mt-16">
+          <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
+            <div>
+              <h2 className="text-4xl font-bold">My Ratings / Reviews</h2>
+              <p className="text-gray-400 text-sm mt-2">Everything you have rated, along with the notes you wrote.</p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setRatingsFilter("all")}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${ratingsFilter === "all"
+                  ? "bg-blue-600 text-white"
+                  : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
+                  }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setRatingsFilter("movie")}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${ratingsFilter === "movie"
+                  ? "bg-blue-600 text-white"
+                  : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
+                  }`}
+              >
+                Movies
+              </button>
+              <button
+                onClick={() => setRatingsFilter("series")}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${ratingsFilter === "series"
+                  ? "bg-blue-600 text-white"
+                  : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
+                  }`}
+              >
+                Series
+              </button>
+              <button
+                onClick={() => setRatingsFilter("anime")}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${ratingsFilter === "anime"
+                  ? "bg-blue-600 text-white"
+                  : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
+                  }`}
+              >
+                Anime
+              </button>
+              <button
+                onClick={() => setRatingsFilter("manga")}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${ratingsFilter === "manga"
+                  ? "bg-blue-600 text-white"
+                  : "bg-[#1a1b29] hover:bg-[#25263c] text-gray-300"
+                  }`}
+              >
+                Manga
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div className="bg-[#1a1b29] border border-[#252636] rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-blue-400">{ratingCounts.total}</div>
+              <div className="text-sm text-gray-400 mt-1">Total</div>
+            </div>
+            <div className="bg-[#1a1b29] border border-[#252636] rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-purple-400">{ratingCounts.movies}</div>
+              <div className="text-sm text-gray-400 mt-1">Movies</div>
+            </div>
+            <div className="bg-[#1a1b29] border border-[#252636] rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-pink-400">{ratingCounts.series}</div>
+              <div className="text-sm text-gray-400 mt-1">Series</div>
+            </div>
+            <div className="bg-[#1a1b29] border border-[#252636] rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-green-400">{ratingCounts.anime}</div>
+              <div className="text-sm text-gray-400 mt-1">Anime</div>
+            </div>
+            <div className="bg-[#1a1b29] border border-[#252636] rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-pink-400">{ratingCounts.manga}</div>
+              <div className="text-sm text-gray-400 mt-1">Manga</div>
+            </div>
+          </div>
+
+          {ratingsLoading ? (
+            <div className="py-16 text-center text-gray-400">Loading your ratings and reviews...</div>
+          ) : ratings.length === 0 ? (
+            <div className="py-12 text-center bg-[#0f1120] border border-[#252636] rounded-2xl">
+              <p className="text-gray-400 text-xl mb-3">You have not rated anything yet</p>
+              <p className="text-gray-500 text-sm">Open a title and submit a rating or review to see it here.</p>
+            </div>
+          ) : filteredRatings.length === 0 ? (
+            <p className="text-gray-400 text-center py-10">No ratings match the selected filter</p>
+          ) : (
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              variants={container}
+              initial="hidden"
+              animate="show"
+            >
+              {filteredRatings.map((rating, idx) => {
+                const ratingId = getRatingId(rating) ?? idx;
+                const ratingType = getRatingType(rating);
+                const detailsPath = ratingType && ratingId ? `/details/${ratingType}/${ratingId}` : null;
+                const reviewDate = getRatingDate(rating);
+                const posterSrc = getRatingPoster(rating);
+                const ratingValue = getRatingValue(rating);
+
+                return (
+                  <motion.div
+                    key={ratingId}
+                    className="bg-[#1a1b29] rounded-xl overflow-hidden shadow-lg border border-[#252636]"
+                    variants={item}
+                    whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                  >
+                    <div className="relative">
+                      <img
+                        src={rating.mediaType === "anime" || rating.mediaType === "manga" ? posterSrc : `https://image.tmdb.org/t/p/w500${posterSrc}`}
+                        alt={getRatingTitle(rating)}
+                        className="w-full h-56 object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "/popcorn.png";
+                        }}
+                      />
+
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+
+                      <div className="absolute top-3 left-3 bg-black/75 backdrop-blur-sm text-yellow-400 px-2 py-1 rounded-md text-sm font-bold flex items-center gap-1">
+                        <span>★</span>
+                        <span>{ratingValue.toFixed(1)}</span>
+                      </div>
+
+                      <div className="absolute top-3 right-3">
+                        <div className={`${ratingType.includes("movie") ? "bg-purple-600/90" :
+                          ratingType.includes("series") || ratingType.includes("tv") ? "bg-pink-600/90" :
+                            ratingType.includes("anime") ? "bg-green-600/90" :
+                              "bg-gray-600/90"
+                          } text-xs text-white px-2 py-1 rounded-md font-medium`}>
+                          {ratingType.includes("movie") ? "Movie" :
+                            ratingType.includes("series") || ratingType.includes("tv") ? "Series" :
+                              ratingType.includes("anime") ? "Anime" : "Manga"}
+                        </div>
+                      </div>
+
+                      {detailsPath ? (
+                        <Link
+                          to={detailsPath}
+                          state={{ poster: rating }}
+                          className="absolute bottom-3 left-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-sm font-medium transition-all"
+                        >
+                          View Details
+                        </Link>
+                      ) : null}
+                    </div>
+
+                    <div className="p-4 space-y-3">
+                      <div>
+                        <h3 className="font-bold text-lg text-white truncate">
+                          {getRatingTitle(rating)}
+                        </h3>
+                        <p className="text-xs text-gray-500 mt-1 uppercase tracking-[0.24em]">
+                          {reviewDate ? new Date(reviewDate).toLocaleDateString() : "Recently"}
+                        </p>
+                      </div>
+
+                      <p className="text-gray-300 text-sm leading-relaxed line-clamp-4 min-h-[5.5rem]">
+                        {getRatingReview(rating)}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
+        </div>
       </div>}
     </div>
   );
