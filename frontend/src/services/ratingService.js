@@ -70,3 +70,14 @@ export const getAllRatingsOfUser = async () => {
 
   return response.data.data;
 };
+
+export const deleteRating = async (mediaType, mediaId) => {
+  const response = await axiosInstance.delete(
+    `/rating/reviews/${mediaType}/${mediaId}`,
+    {
+      headers: getAuthHeaders(),
+    },
+  );
+
+  return response.data.data;
+};
